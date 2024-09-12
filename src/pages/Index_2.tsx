@@ -52,7 +52,7 @@ const Index = () => {
 
     const packing_cntr_l1 = packing_l1.map(item => item.cntr_carton);
     const packing_cntr_l2 = packing_l2.map(item => item.cntr_carton);
-    
+
     const packingAchive_l1 = (packing_cntr_l1/total_planing_l1) * 100;
     const packingAchive_l2 = (packing_cntr_l2/total_planing_l2) * 100;
 
