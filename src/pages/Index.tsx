@@ -309,8 +309,8 @@ const Index = () => {
                                         {JamPackingl1_shift.length > 0 ? (
                                             JamPackingl1_shift.map((item, index) => (
                                                 <tr>
-                                                    <td className="border border-red-500 px-2 py-2 text-black text-5xl font-extrabold w-1/5">{index + 1}</td>
-                                                    <td className="border border-red-500 px-2 py-2 text-black text-5xl font-extrabold w-3/5">{item}</td>
+                                                    <td className="border border-red-500 px-2 py-2 text-black text-4xl font-extrabold w-1/5">{index + 1}</td>
+                                                    <td className="border border-red-500 px-2 py-2 text-black text-4xl font-extrabold w-3/5">{item}</td>
                                                 </tr>
                                             ))) : (<tr>
                                                 <td className="border border-red-500 px-2 py-2 text-black text-5xl font-extrabold w-1/5">1</td>
@@ -322,7 +322,7 @@ const Index = () => {
                         </div>
                         <div className="flex flex-col md:flex-row items-center mb-2">
                             <div className="w-[100%] md:w-[50%] h-[300px] shadow-[1px_2px_12px_0_rgba(31,45,61,0.10)] rounded border border-white-light dark:border-[#1b2e4b] flex flex-col justify-center mb-2 md:mb-0 md:mr-2">
-                                 <h4 className="text-black text-5xl mt-4 text-center dark:text-white font-black font-extrabold mb-2">Achive</h4>
+                                 <h4 className="text-black text-5xl mt-4 text-center dark:text-white font-black font-extrabold mb-2">Achieve</h4>
                                 <div className="flex flex-col items-center justify-center h-full">
                                     {/* Data Carton */}
                                         <span className="text-red-600 text-[70px] xl:text-[130px] font-black text-center ">{Math.trunc(packingAchive_l1)}%</span>
@@ -396,8 +396,8 @@ const Index = () => {
                                         {JamPackingl2_shift.length > 0 ? (
                                             JamPackingl2_shift.map((item, index) => (
                                                 <tr>
-                                                    <td className="border border-red-500 px-2 py-2 text-black text-5xl font-extrabold w-1/5">{index + 1}</td>
-                                                    <td className="border border-red-500 px-2 py-2 text-black text-5xl font-extrabold w-3/5">{item}</td>
+                                                    <td className="border border-red-500 px-2 py-2 text-black text-4xl font-extrabold w-1/5">{index + 1}</td>
+                                                    <td className="border border-red-500 px-2 py-2 text-black text-4xl font-extrabold w-3/5">{item}</td>
                                                 </tr>
                                             ))) : (<tr>
                                                 <td className="border border-red-500 px-2 py-2 text-black text-5xl font-extrabold w-1/5">1</td>
@@ -409,7 +409,7 @@ const Index = () => {
                         </div>
                         <div className="flex flex-col md:flex-row items-center mb-2">
                             <div className="w-[100%] md:w-[50%] h-[300px] shadow-[1px_2px_12px_0_rgba(31,45,61,0.10)] rounded border border-white-light dark:border-[#1b2e4b] flex flex-col justify-center mb-2 md:mb-0 md:mr-2">
-                                 <h4 className="text-black text-5xl mt-4 text-center dark:text-white font-black font-extrabold mb-2">Achive</h4>
+                                 <h4 className="text-black text-5xl mt-4 text-center dark:text-white font-black font-extrabold mb-2">Achieve</h4>
                                 <div className="flex flex-col items-center justify-center h-full">
                                     {/* Data Carton */}
                                         <span className="text-red-600 text-[70px] xl:text-[130px] font-black text-center ">{Math.trunc(packingAchive_l2)}%</span>
