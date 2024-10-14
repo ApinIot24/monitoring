@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import CountUp from 'react-countup';
 import axios from 'axios';
 import IconArrowLeft from '../components/Icon/IconArrowLeft';
-import mayoraimg from '../../public/favicon.png';
+import mayoraimg from '../../public/assets/images/logo2.png';
 import dayjs from 'dayjs';
 import { date } from 'yup';
 
@@ -25,7 +25,17 @@ const Index = () => {
 
     const [isLoading, setLoading] = useState(true);
     const [error, setError] = useState(null);
- 
+    const handlefullscrean = () => {
+        if(!document.fullscreenElement){
+            document.documentElement.requestFullscreen().then(() => {
+                setfullscrean(true);
+            });
+        } else {
+            document.exitFullscreen().then(() => {
+                setfullscrean(false);
+            })
+        }
+    }
     // const today = dayjs().format('YYYY-MM-DD');
     // const today = '2024-09-05';
     const [urlapi] = useState({
@@ -52,9 +62,9 @@ const Index = () => {
 
     const packing_cntr_l1 = packing_l1.map(item => item.cntr_carton);
     const packing_cntr_l2 = packing_l2.map(item => item.cntr_carton);
-    
-    const packingAchive_l1 = (packing_cntr_l1/total_planing_l1) * 100;
-    const packingAchive_l2 = (packing_cntr_l2/total_planing_l2) * 100;
+
+    const packingAchive_l1 = (packing_cntr_l1 / total_planing_l1) * 100;
+    const packingAchive_l2 = (packing_cntr_l2 / total_planing_l2) * 100;
 
     useEffect(() => {
         // Fungsi untuk mengambil data dari server
@@ -80,7 +90,7 @@ const Index = () => {
         };
         fetchData();
         fetchData1();
-   
+
         const interval = setInterval(() => {
             fetchData();
             fetchData1();
@@ -97,29 +107,29 @@ const Index = () => {
 
             if ((hours === 6 && minutes >= 46) || ((hours > 6 && hours < 14) || hours === 14 && minutes <= 45)) {
                 axios.get(urlapi.packingl1_shift1)
-                .then(response => {
-                    var datalasts = response.data;
-                    let counts = [];
-                            for (let index = 0; index < datalasts.length; index++) {
-                                if( index === 0) {
-                                    counts.push(datalasts[index].cntr_carton)
-                                } else {
-                                    counts.push(datalasts[index].cntr_carton - datalasts[index - 1].cntr_carton)
-                                } 
+                    .then(response => {
+                        var datalasts = response.data;
+                        let counts = [];
+                        for (let index = 0; index < datalasts.length; index++) {
+                            if (index === 0) {
+                                counts.push(datalasts[index].cntr_carton)
+                            } else {
+                                counts.push(datalasts[index].cntr_carton - datalasts[index - 1].cntr_carton)
                             }
-                            console.log("packing1", counts)
-                            setJamPackingl1_shift(counts)
-                        })
-                        .catch(error => {
-                            console.log(error);
-                        });
+                        }
+                        console.log("packing1", counts)
+                        setJamPackingl1_shift(counts)
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    });
             } else if ((hours === 14 && minutes >= 46) || ((hours > 14 && hours < 22) || hours === 22 && minutes <= 45)) {
                 axios.get(urlapi.packingl1_shift2)
                     .then(response => {
                         var datalasts = response.data;
                         let counts = [];
                         for (let index = 0; index < datalasts.length; index++) {
-                            if( index === 0) {
+                            if (index === 0) {
                                 counts.push(datalasts[index].cntr_carton)
                             } else {
                                 counts.push(datalasts[index].cntr_carton - datalasts[index - 1].cntr_carton)
@@ -138,7 +148,7 @@ const Index = () => {
                         var datalasts = response.data;
                         let counts = [];
                         for (let index = 0; index < datalasts.length; index++) {
-                            if( index === 0) {
+                            if (index === 0) {
                                 counts.push(datalasts[index].cntr_carton)
                             } else {
                                 counts.push(datalasts[index].cntr_carton - datalasts[index - 1].cntr_carton)
@@ -163,7 +173,7 @@ const Index = () => {
                         var datalasts = response.data;
                         let counts = [];
                         for (let index = 0; index < datalasts.length; index++) {
-                            if( index === 0) {
+                            if (index === 0) {
                                 counts.push(datalasts[index].cntr_carton)
                             } else {
                                 counts.push(datalasts[index].cntr_carton - datalasts[index - 1].cntr_carton)
@@ -182,7 +192,7 @@ const Index = () => {
                         var datalasts = response.data;
                         let counts = [];
                         for (let index = 0; index < datalasts.length; index++) {
-                            if( index === 0) {
+                            if (index === 0) {
                                 counts.push(datalasts[index].cntr_carton)
                             } else {
                                 counts.push(datalasts[index].cntr_carton - datalasts[index - 1].cntr_carton)
@@ -201,7 +211,7 @@ const Index = () => {
                         var datalasts = response.data;
                         let counts = [];
                         for (let index = 0; index < datalasts.length; index++) {
-                            if( index === 0) {
+                            if (index === 0) {
                                 counts.push(datalasts[index].cntr_carton)
                             } else {
                                 counts.push(datalasts[index].cntr_carton - datalasts[index - 1].cntr_carton)
@@ -219,7 +229,7 @@ const Index = () => {
         const shift1Packingl1 = () => {
             axios.get(urlapi.packingl1_shift)
                 .then(response => {
-                    const dataolah = response.data[0];
+                    const dataolah = response.data[0] ? response.data[0] : 0;
                     console.log('shift1Packingl1', dataolah);
                     setShiftPackingl1(dataolah)
                     // let shifts = [];
@@ -276,9 +286,9 @@ const Index = () => {
                         <h1 className="text-white  text-5xl 2xl:text-[65px] font-black dark:text-white-light">LINE 1</h1>
                         <IconArrowLeft className='h-[100px] w-[100px] text-white' />
                         <span className='text-white  text-5xl 2xl:text-[65px] font-black'>1,008 CARTON</span>
-                        <div className="bg-white items-center rounded-lg p-2 ml-auto">
+                        <button onClick={handlefullscrean} className="items-center rounded-lg p-2 ml-auto">
                             <img src={mayoraimg} alt="" className='h-[50px]  md:h-[70px] lg:h-[100px]' />
-                        </div>
+                        </button>
                     </div>
                     <div className="py-7 px-6">
                         <div className="flex flex-row items-center mb-2">
@@ -308,13 +318,23 @@ const Index = () => {
                                     <tbody>
                                         {JamPackingl1_shift.length > 0 ? (
                                             JamPackingl1_shift.map((item, index) => (
-                                                <tr>
-                                                    <td className="border border-red-500 px-2 py-2 text-black text-4xl font-extrabold w-1/5">{index + 1}</td>
-                                                    <td className="border border-red-500 px-2 py-2 text-black text-4xl font-extrabold w-3/5">{item}</td>
+                                                <tr key={index}>
+                                                    <td
+                                                        className={`border border-red-500 px-2 py-2 text-black font-extrabold w-1/5 ${JamPackingl1_shift.length > 4 ? 'text-5xl' : 'text-8xl'
+                                                            }`}
+                                                    >
+                                                        {index + 1}
+                                                    </td>
+                                                    <td
+                                                        className={`border border-red-500 px-2 py-2 text-black font-extrabold w-3/5 ${JamPackingl1_shift.length > 4 ? 'text-5xl' : 'text-8xl'
+                                                            }`}
+                                                    >
+                                                        {item}
+                                                    </td>
                                                 </tr>
                                             ))) : (<tr>
-                                                <td className="border border-red-500 px-2 py-2 text-black text-5xl font-extrabold w-1/5">1</td>
-                                                <td className="border border-red-500 px-2 py-2 text-black text-5xl font-extrabold w-3/5">0</td>
+                                                <td className="border border-red-500 px-2 py-2 text-black text-9xl font-extrabold w-1/5">1</td>
+                                                <td className="border border-red-500 px-2 py-2 text-black text-9xl font-extrabold w-3/5">0</td>
                                             </tr>)}
                                     </tbody>
                                 </table>
@@ -322,10 +342,10 @@ const Index = () => {
                         </div>
                         <div className="flex flex-col md:flex-row items-center mb-2">
                             <div className="w-[100%] md:w-[50%] h-[300px] shadow-[1px_2px_12px_0_rgba(31,45,61,0.10)] rounded border border-white-light dark:border-[#1b2e4b] flex flex-col justify-center mb-2 md:mb-0 md:mr-2">
-                                 <h4 className="text-black text-5xl mt-4 text-center dark:text-white font-black font-extrabold mb-2">Achieve</h4>
+                                <h4 className="text-black text-5xl mt-4 text-center dark:text-white font-black font-extrabold mb-2">Achive</h4>
                                 <div className="flex flex-col items-center justify-center h-full">
                                     {/* Data Carton */}
-                                        <span className="text-red-600 text-[70px] xl:text-[130px] font-black text-center ">{Math.trunc(packingAchive_l1)}%</span>
+                                    <span className="text-red-600 text-[70px] xl:text-[130px] font-black text-center ">{Math.trunc(packingAchive_l1)}%</span>
                                 </div>
                             </div>
                             <div className="w-[100%] md:w-[50%] h-[300px] shadow-[1px_2px_12px_0_rgba(31,45,61,0.10)] rounded border border-white-light dark:border-[#1b2e4b] flex justify-center">
@@ -363,9 +383,9 @@ const Index = () => {
                         <h1 className="text-white  text-5xl 2xl:text-[65px] font-black dark:text-white-light">LINE 2</h1>
                         <IconArrowLeft className='h-[100px] w-[100px] text-white' />
                         <span className='text-white  text-5xl 2xl:text-[65px] font-black'>1,344 CARTON</span>
-                        <div className="bg-white items-center rounded-lg p-2 ml-auto">
+                        <button onClick={handlefullscrean} className="items-center rounded-lg p-2 ml-auto">
                             <img src={mayoraimg} alt="" className='h-[50px]  md:h-[70px] lg:h-[100px]' />
-                        </div>
+                        </button>
                     </div>
                     <div className="py-7 px-6">
                         <div className="flex flex-row items-center mb-2">
@@ -395,13 +415,23 @@ const Index = () => {
                                     <tbody>
                                         {JamPackingl2_shift.length > 0 ? (
                                             JamPackingl2_shift.map((item, index) => (
-                                                <tr>
-                                                    <td className="border border-red-500 px-2 py-2 text-black text-4xl font-extrabold w-1/5">{index + 1}</td>
-                                                    <td className="border border-red-500 px-2 py-2 text-black text-4xl font-extrabold w-3/5">{item}</td>
+                                                <tr key={index}>
+                                                    <td
+                                                        className={`border border-red-500 px-2 py-2 text-black font-extrabold w-1/5 ${JamPackingl2_shift.length > 4 ? 'text-5xl' : 'text-8xl'
+                                                            }`}
+                                                    >
+                                                        {index + 1}
+                                                    </td>
+                                                    <td
+                                                        className={`border border-red-500 px-2 py-2 text-black font-extrabold w-3/5 ${JamPackingl2_shift.length > 4 ? 'text-5xl' : 'text-8xl'
+                                                            }`}
+                                                    >
+                                                        {item}
+                                                    </td>
                                                 </tr>
                                             ))) : (<tr>
-                                                <td className="border border-red-500 px-2 py-2 text-black text-5xl font-extrabold w-1/5">1</td>
-                                                <td className="border border-red-500 px-2 py-2 text-black text-5xl font-extrabold w-3/5">0</td>
+                                                <td className="border border-red-500 px-2 py-2 text-black text-9xl font-extrabold w-1/5">1</td>
+                                                <td className="border border-red-500 px-2 py-2 text-black text-9xl font-extrabold w-3/5">0</td>
                                             </tr>)}
                                     </tbody>
                                 </table>
@@ -409,10 +439,10 @@ const Index = () => {
                         </div>
                         <div className="flex flex-col md:flex-row items-center mb-2">
                             <div className="w-[100%] md:w-[50%] h-[300px] shadow-[1px_2px_12px_0_rgba(31,45,61,0.10)] rounded border border-white-light dark:border-[#1b2e4b] flex flex-col justify-center mb-2 md:mb-0 md:mr-2">
-                                 <h4 className="text-black text-5xl mt-4 text-center dark:text-white font-black font-extrabold mb-2">Achieve</h4>
+                                <h4 className="text-black text-5xl mt-4 text-center dark:text-white font-black font-extrabold mb-2">Achive</h4>
                                 <div className="flex flex-col items-center justify-center h-full">
                                     {/* Data Carton */}
-                                        <span className="text-red-600 text-[70px] xl:text-[130px] font-black text-center ">{Math.trunc(packingAchive_l2)}%</span>
+                                    <span className="text-red-600 text-[70px] xl:text-[130px] font-black text-center ">{Math.trunc(packingAchive_l2)}%</span>
                                 </div>
                             </div>
                             <div className="w-[100%] md:w-[50%] h-[300px] shadow-[1px_2px_12px_0_rgba(31,45,61,0.10)] rounded border border-white-light dark:border-[#1b2e4b] flex justify-center">
@@ -438,92 +468,13 @@ const Index = () => {
                                         </tr>     <tr>
                                             <td className="border border-red-500 px-2 py-1 text-black text-7xl font-extrabold">3</td>
                                             <td className="border border-red-500 px-2 py-1 text-black text-7xl font-extrabold">{ShiftPackingl2.shift3}</td>
-                                        </tr>
+                                        </tr> 
                                     </tbody>
                                 </table>
                             </div>
                         </div>
                     </div>
                 </div>
-                {/* <div className="lg:max-w-[50%] w-full bg-white shadow-[4px_6px_10px_-3px_#bfc9d4] rounded border border-white-light dark:border-[#1b2e4b] dark:bg-[#191e3a] dark:shadow-none">
-                    <div className="p-5 bg-red-600 flex  items-center">
-                        <h1 className="text-white text-5xl 2xl:text-[65px] font-black dark:text-white-light">LINE 2</h1>
-                        <IconArrowLeft className='h-[100px] w-[100px] text-white' />
-                        <span className='text-white text-5xl 2xl:text-[65px] font-black'>1,344 CARTON</span>
-                        <div className="bg-white items-center rounded-lg p-2 ml-auto">
-                            <img src={mayoraimg} alt="" className='h-[50px]  md:h-[70px] lg:h-[100px]' />
-                        </div>
-                    </div>
-                    <div className="py-7 px-6">
-                        <div className="flex flex-row items-center mb-2">
-                            <div className="w-[50%] h-[500px] shadow-[1px_2px_12px_0_rgba(31,45,61,0.10)] rounded border border-white-light dark:border-[#1b2e4b] flex flex-col items-center mr-2">
-                                <h4 className="text-black text-5xl mt-4 text-center dark:text-white font-black font-extrabold mb-2">ACTUAL</h4>
-                                <div className="flex flex-col items-center justify-center h-full">
-                                    {packing_l2.map(item => (
-                                        <span className="text-red-600 text-[70px] xl:text-[170px] font-black text-center mt-[100px]">{item.cntr_carton}</span>
-                                    ))}
-                                    <h4 className="text-black text-5xl text-center dark:text-white font-extrabold mt-[150px]">CARTON</h4>
-                                </div>
-                            </div>
-                            <div className="w-[50%] h-[500px] shadow-[1px_2px_12px_0_rgba(31,45,61,0.10)] rounded border border-white-light dark:border-[#1b2e4b] flex  justify-center">
-                                <table className="w-full text-center border-collapse">
-                                    <thead>
-                                        <tr>
-                                            <th className="border border-red-500 px-4 py-2">
-                                                <h4 className="text-white text-2xl font-extrabold">JAM </h4>
-                                            </th>
-                                            <th className="border border-red-500 px-4 py-2">
-                                                <h4 className="text-white text-2xl font-extrabold">CARTON</h4>
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {JamPackingl2_shift.length > 0 ? (
-                                            JamPackingl2_shift.map((item, index) => (
-                                                <tr>
-                                                    <td className="border border-red-500 px-2 py-2 text-black text-5xl font-extrabold w-1/5">{index + 1}</td>
-                                                    <td className="border border-red-500 px-2 py-2 text-black text-5xl font-extrabold w-3/5">{item}</td>
-                                                </tr>
-                                            ))) : (<tr>
-                                                <td className="border border-red-500 px-2 py-2 text-black text-5xl font-extrabold w-1/5">1</td>
-                                                <td className="border border-red-500 px-2 py-2 text-black text-5xl font-extrabold w-3/5">0</td>
-                                            </tr>)}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        <div className="flex flex-col items-center mb-2">
-                            <div className="w-[100%] h-[300px] shadow-[1px_2px_12px_0_rgba(31,45,61,0.10)] rounded border border-white-light dark:border-[#1b2e4b] flex justify-center">
-                                <table className="w-full text-center border-collapse">
-                                    <thead>
-                                        <tr>
-                                            <th className="border border-red-500 px-4 py-2">
-                                                <h4 className="text-white text-4xl dark:text-white font-extrabold">SHIFT </h4>
-                                            </th>
-                                            <th className="border border-red-500 px-4 py-2">
-                                                <h4 className="text-white text-4xl dark:text-white font-extrabold">CARTON</h4>
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td className="border border-red-500 px-2 py-1 text-black text-7xl font-extrabold">1</td>
-                                            <td className="border border-red-500 px-2 py-1 text-black text-7xl font-extrabold">{ShiftPackingl2.shift1}</td>
-                                        </tr>
-                                        <tr>
-                                            <td className="border border-red-500 px-2 py-1 text-black text-7xl font-extrabold">2</td>
-                                            <td className="border border-red-500 px-2 py-1 text-black text-7xl font-extrabold">{ShiftPackingl2.shift2}</td>
-                                        </tr>
-                                        <tr>
-                                            <td className="border border-red-500 px-2 py-1 text-black text-7xl font-extrabold">3</td>
-                                            <td className="border border-red-500 px-2 py-1 text-black text-7xl font-extrabold">{ShiftPackingl2.shift3}</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div> */}
             </div>
         </div>
     );
