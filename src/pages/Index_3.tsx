@@ -6,7 +6,7 @@ import mayoraimg from '../../public/assets/images/logo2.png';
 import dayjs from 'dayjs';
 import { date } from 'yup';
 
-const Index_2 = () => {
+const Index = () => {
     const [packing_l1, setData] = useState([]);
     const [packing_l2, setData1] = useState([]);
 
@@ -202,23 +202,47 @@ const Index_2 = () => {
                     </div>
                     <div className="py-7 px-6">
                         <div className="flex flex-row items-center mb-2">
-                            <div className="w-[50%] h-[500px] shadow-[1px_2px_12px_0_rgba(31,45,61,0.10)] rounded border border-white-light dark:border-[#1b2e4b] flex flex-col items-center mr-2">
-                                <h4 className="text-black text-5xl mt-4 text-center dark:text-white font-black font-extrabold mb-2">ACTUAL</h4>
-                                <div className="flex flex-col items-center justify-center h-full">
+                            <div className="w-[50%] h-[500px] shadow-[1px_2px_12px_0_rgba(31,45,61,0.10)] rounded border border-white-light dark:border-[#1b2e4b] flex flex-col items-center mr-2 relative">
+                                <h4 className="text-black text-4xl mt-4 text-center dark:text-white font-black font-extrabold mb-2 z-20">ACTUAL</h4>
+                                <div className="flex flex-col items-center justify-center h-full relative w-[100%]">
+                                    {/* Lingkaran Pencapaian */}
+                                    <div className="absolute inset-0 flex items-center justify-center">
+                                        <svg className="w-[90%] h-[90%]" viewBox="0 0 36 36">
+                                            <path
+                                                className="text-gray-300"
+                                                d="M18 2.0845
+                            a 15.9155 15.9155 0 0 1 0 31.831
+                            a 15.9155 15.9155 0 0 1 0 -31.831"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                strokeWidth="2.5"
+                                            />
+                                            <path
+                                                className={`text-red-600`} // Warna berdasarkan pencapaian
+                                                d="M18 2.0845
+                            a 15.9155 15.9155 0 0 1 0 31.831"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                strokeDasharray={`${packingAchive_l1}, 100`}
+                                                strokeWidth="2.5"
+                                                strokeLinecap="round"
+                                            />
+                                        </svg>
+                                    </div>
                                     {/* Data Carton */}
                                     {packing_l1.map(item => (
-                                        <span className="text-red-600 text-[70px] xl:text-[170px] font-black text-center mt-[100px]">{item.cntr_carton}</span>
+                                        <span className="relative z-20 text-red-600 text-[60px] xl:text-[120px] font-black text-center mt-[50px]">{item.cntr_carton}</span>
                                     ))}
                                     {/* Label Carton */}
-                                    <h4 className="text-black text-5xl text-center dark:text-white font-extrabold mt-[150px]">CARTON</h4>
+                                    <h4 className="text-black text-3xl text-center dark:text-white font-extrabold mt-[80px] relative z-20">CARTON</h4>
                                 </div>
                             </div>
-                            <div className="w-[50%] h-[500px] shadow-[1px_2px_12px_0_rgba(31,45,61,0.10)] rounded border border-white-light dark:border-[#1b2e4b] flex  justify-center">
+                            <div className="w-[50%] h-[500px] shadow-[1px_2px_12px_0_rgba(31,45,61,0.10)] rounded border border-white-light dark:border-[#1b2e4b] flex justify-center">
                                 <table className="w-full text-center border-collapse">
                                     <thead>
                                         <tr>
                                             <th className="border border-red-500 px-4 py-2">
-                                                <h4 className="text-white text-2xl font-extrabold">JAM </h4>
+                                                <h4 className="text-white text-2xl font-extrabold">JAM</h4>
                                             </th>
                                             <th className="border border-red-500 px-4 py-2">
                                                 <h4 className="text-white text-2xl font-extrabold">CARTON</h4>
@@ -227,30 +251,43 @@ const Index_2 = () => {
                                     </thead>
                                     <tbody>
                                         {JamPackingl1_shift.length > 0 ? (
-                                            JamPackingl1_shift.map((item, index) => (
-                                                <tr key={index}>
-                                                    <td
-                                                        className={`border border-red-500 px-2 py-2 text-black font-extrabold w-1/5 ${JamPackingl1_shift.length > 4 ? 'text-5xl' : 'text-8xl'
-                                                            }`}
-                                                    >
-                                                        {index + 1}
-                                                    </td>
-                                                    <td
-                                                        className={`border border-red-500 px-2 py-2 text-black font-extrabold w-3/5 ${JamPackingl1_shift.length > 4 ? 'text-5xl' : 'text-8xl'
-                                                            }`}
-                                                    >
-                                                        {item}
-                                                    </td>
-                                                </tr>
-                                            ))) : (<tr>
+                                            JamPackingl1_shift.map((item, index) => {
+                                                const maxCarton = 128; // Target per jam
+                                                const percent = (item / maxCarton) * 100; // Hitung persentase
+
+                                                return (
+                                                    <tr key={index}>
+                                                        <td
+                                                            className={`border border-red-500 px-2 py-2 text-black font-extrabold w-1/5 ${JamPackingl1_shift.length > 4 ? 'text-5xl' : 'text-8xl'}`}
+                                                        >
+                                                            {index + 1}
+                                                        </td>
+                                                        <td className="border border-red-500 px-2 py-2 text-black font-extrabold w-3/5 relative">
+                                                            {/* Counter di tengah atas progress bar */}
+                                                            <span className={`text-black font-extrabold ${JamPackingl2_shift.length > 4 ? 'text-5xl' : 'text-8xl'}`}>{item}</span>
+                                                            <div className="relative h-[5px] bg-gray-200 rounded-lg mt-4">
+                                                                {/* Progress bar */}
+                                                                <div
+                                                                    className="absolute top-0 left-0 h-full bg-red-600 rounded-lg"
+                                                                    style={{ width: `${percent}%` }}
+                                                                />
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                );
+                                            })
+                                        ) : (
+                                            <tr>
                                                 <td className="border border-red-500 px-2 py-2 text-black text-9xl font-extrabold w-1/5">1</td>
                                                 <td className="border border-red-500 px-2 py-2 text-black text-9xl font-extrabold w-3/5">0</td>
-                                            </tr>)}
-
+                                            </tr>
+                                        )}
                                     </tbody>
                                 </table>
                             </div>
                         </div>
+
+
                         <div className="flex flex-col md:flex-row items-center mb-2">
                             <div className="w-[100%] md:w-[50%] h-[300px] shadow-[1px_2px_12px_0_rgba(31,45,61,0.10)] rounded border border-white-light dark:border-[#1b2e4b] flex flex-col justify-center mb-2 md:mb-0 md:mr-2">
                                 <h4 className="text-black text-5xl mt-4 text-center dark:text-white font-black font-extrabold mb-2">Achive</h4>
@@ -391,4 +428,4 @@ const Index_2 = () => {
     );
 };
 
-export default Index_2;
+export default Index;

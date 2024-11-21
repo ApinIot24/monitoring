@@ -56,6 +56,9 @@ module.exports = {
           },
           fontFamily: {
               nunito: ['Nunito', 'sans-serif'],
+              bigNumbers: ['Oswald', 'Bebas Neue', 'Montserrat', 'sans-serif'], // Urutkan font sesuai prioritas Anda
+              montserrat: ['Montserrat', 'sans-serif'],
+              poppins: ['Poppins', 'sans-serif'],
           },
           spacing: {
               4.5: '18px',
