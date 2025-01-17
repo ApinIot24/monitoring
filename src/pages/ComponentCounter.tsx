@@ -6,7 +6,7 @@ import IconCalendar from '../components/Icon/IconCalendar';
 import mayoraimg from '../../public/assets/images/logo2.png';
 import { Link } from 'react-router-dom';
 
-const ComponentCounter = ({ line, url , label}) => {
+const ComponentCounter = ({ line, url, label, nameOpsi = null}) => {
     const [currentTime, setCurrentTime] = useState(new Date());
     const [currentShift, setCurrentShift] = useState(null);
     const [packingData, setPackingData] = useState({ cntr_carton: 0 });
@@ -42,10 +42,20 @@ const ComponentCounter = ({ line, url , label}) => {
 
     const TOTAL_CARTON = {
         l1: 1008,
-        l2: 1344,
+        l2: 907,
         l5: 6640,
+        l6: 3040,
         l7: 2432,
     };
+    const TOTAL_CARTON_Sabtu = {
+        l1: 630,
+        l2: 473,
+        l5: 4150,
+        l6: 1900,
+        l7: 1330,
+    };
+
+
 
     const fetchPackingData = async () => {
         try {
@@ -72,18 +82,55 @@ const ComponentCounter = ({ line, url , label}) => {
             const now = new Date();
             const hours = now.getHours();
             const minutes = now.getMinutes();
+            const day = now.getDay(); // 0 = Minggu, 1 = Senin, ..., 6 = Sabtu
+
             let shift;
 
-            if ((hours === 6 && minutes >= 46) || ((hours > 6 && hours < 14) || (hours === 14 && minutes <= 45))) {
-                shift = 1;
-                return { shift, url: APIURLs.hourly.shift1 };
-            } else if ((hours === 14 && minutes >= 46) || ((hours > 14 && hours < 22) || (hours === 22 && minutes <= 45))) {
-                shift = 2;
-                return { shift, url: APIURLs.hourly.shift2 };
+            // Logika untuk Senin-Jumat
+            // if (day >= 2 && day <= 6) {
+            //     if ((hours === 6 && minutes >= 46) || ((hours > 6 && hours < 14) || (hours === 14 && minutes <= 45))) {
+            //         shift = 1;
+            //         return { shift, url: APIURLs.hourly.shift1 };
+            //     } else if ((hours === 14 && minutes >= 46) || ((hours > 14 && hours < 22) || (hours === 22 && minutes <= 45))) {
+            //         shift = 2;
+            //         return { shift, url: APIURLs.hourly.shift2 };
+            //     } else {
+            //         shift = 3;
+            //         return { shift, url: APIURLs.hourly.shift3 };
+            //     }
+            // }
+
+            // // Logika khusus Sabtu
+            if (day === 1) {
+                if ((hours === 6 && minutes >= 46) || ((hours > 6 && hours < 11) || (hours === 11 && minutes <= 45))) {
+                    // Shift 1 Sabtu: 06:46 - 12:45
+                    shift = 1;
+                    return { shift, url: APIURLs.hourly.shift1 };
+                } else if ((hours === 11 && minutes >= 46) || ((hours > 11 && hours < 16) || (hours === 16 && minutes <= 45))) {
+                    // Shift 2 Sabtu: 12:46 - 18:45
+                    shift = 2;
+                    return { shift, url: APIURLs.hourly.shift2 };
+                } else {
+                    // Shift 3 Sabtu: 18:46 - 21:45 (berakhir lebih awal)
+                    shift = 3;
+                    return { shift, url: APIURLs.hourly.shift3 };
+                }
             } else {
-                shift = 3;
-                return { shift, url: APIURLs.hourly.shift3 };
+                if ((hours === 6 && minutes >= 46) || ((hours > 6 && hours < 14) || (hours === 14 && minutes <= 45))) {
+                    shift = 1;
+                    return { shift, url: APIURLs.hourly.shift1 };
+                } else if ((hours === 14 && minutes >= 46) || ((hours > 14 && hours < 22) || (hours === 22 && minutes <= 45))) {
+                    shift = 2;
+                    return { shift, url: APIURLs.hourly.shift2 };
+                } else {
+                    shift = 3;
+                    return { shift, url: APIURLs.hourly.shift3 };
+                }
             }
+
+            // Logika untuk Minggu atau fallback (jika tidak ada shift)
+            shift = null;
+            return { shift, url: null };
         };
 
         try {
@@ -99,6 +146,17 @@ const ComponentCounter = ({ line, url , label}) => {
             console.error(err);
             setError('Gagal memuat data per jam');
         }
+    };
+
+    const getTotalCarton = (line) => {
+        const currentDay = new Date().getDay(); // 0 = Minggu, 1 = Senin, ..., 6 = Sabtu
+
+        if (currentDay === 6) {
+            // Jika hari Sabtu
+            return TOTAL_CARTON_Sabtu[line] || 1000; // Default jika line tidak dikenal
+        }
+
+        return TOTAL_CARTON[line] || 1000; // Hari lainnya
     };
 
     useEffect(() => {
@@ -123,9 +181,11 @@ const ComponentCounter = ({ line, url , label}) => {
 
     const getTotalPacked = () => packingData.cntr_carton;
     const getAchievement = () => {
-        const total = TOTAL_CARTON[line] || 1000; // Default jika line tidak dikenal
+        const total = getTotalCarton(line); // Memilih total berdasarkan hari
         return Math.round((getTotalPacked() / total) * 100);
     };
+
+
 
     return (
         <div>
@@ -144,11 +204,11 @@ const ComponentCounter = ({ line, url , label}) => {
                             </Link>
                         </div>
                         <div className="flex flex-row items-center">
-                            <h1 className="text-white text-5xl 2xl:text-[50px] font-black font-bigNumbers mt-4">{label} LINE {line.slice(-1)}</h1>
+                            <h1 className="text-white text-5xl 2xl:text-[50px] font-black font-bigNumbers mt-4">  {(nameOpsi != null ? nameOpsi : label)} LINE {line.slice(-1)}</h1>
                             <Link to={url} className="flex items-center mt-4">
                                 <IconArrowLeft className="h-[100px] w-[100px] text-white" />
                             </Link>
-                            <h1 className="text-white text-5xl 2xl:text-[50px] font-black font-bigNumbers mt-4">{TOTAL_CARTON[line]} CARTON</h1>
+                            <h1 className="text-white text-5xl 2xl:text-[50px] font-black font-bigNumbers mt-4">{getTotalCarton(line)} CARTON</h1>
                             <button onClick={handleFullScreen} className="mt-4 items-center rounded-lg p-2">
                                 <img src={mayoraimg} alt="" className="h-[50px] md:h-[70px] lg:h-[100px]" />
                             </button>
@@ -182,7 +242,7 @@ const ComponentCounter = ({ line, url , label}) => {
                                     <tbody>
                                         {hourlyData.length > 0 ? (
                                             hourlyData.map((carton, idx) => {
-                                                const maxCarton = TOTAL_CARTON[line];
+                                                const maxCarton = getTotalCarton(line);
                                                 const percent = ((carton / maxCarton) * 100).toFixed(1); // Hitung persentase
                                                 return (
                                                     <tr key={idx}>
@@ -228,7 +288,7 @@ const ComponentCounter = ({ line, url , label}) => {
                                     </thead>
                                     <tbody className='font-bigNumbers'>
                                         {Object.entries(shiftData).map(([shift, carton]) => {
-                                            const maxCarton = TOTAL_CARTON[line]; // Target per shift
+                                            const maxCarton = getTotalCarton(line); // Target per shift
                                             const percent = ((carton / maxCarton) * 100).toFixed(1); // Hitung persentase
                                             return (
                                                 <tr key={shift}>
