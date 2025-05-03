@@ -41,17 +41,17 @@ const ComponentCounter = ({ line, url, label, nameOpsi = null}) => {
     };
 
     const TOTAL_CARTON = {
-        l1: 1008,
-        l2: 907,
+        l1: 1120,
+        l2: 1512,
         l5: 6640,
-        l6: 3040,
+        l6: 2432,
         l7: 2432,
     };
     const TOTAL_CARTON_Sabtu = {
         l1: 630,
         l2: 473,
         l5: 4150,
-        l6: 1900,
+        l6: 1330,
         l7: 1330,
     };
 
@@ -101,7 +101,7 @@ const ComponentCounter = ({ line, url, label, nameOpsi = null}) => {
             // }
 
             // // Logika khusus Sabtu
-            if (day === 1) {
+            if (day === 6) {
                 if ((hours === 6 && minutes >= 46) || ((hours > 6 && hours < 11) || (hours === 11 && minutes <= 45))) {
                     // Shift 1 Sabtu: 06:46 - 12:45
                     shift = 1;
