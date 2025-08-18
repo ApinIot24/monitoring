@@ -294,10 +294,22 @@ const ComponentCounter: React.FC<ComponentCounterProps> = ({ line, url, label, n
                             </div>
                         </section>
                         <section className="flex flex-col md:flex-row items-center mb-2 gap-6 bg-gradient-to-br from-white via-red-50 to-red-100 p-6">
-                            <div className="w-full min-h-[16rem] h-auto shadow-md rounded-xl border border-red-200 flex flex-col justify-center mb-2 md:mb-0 bg-white">
+                            <div className="w-full min-h-[16rem] h-auto shadow-md rounded-xl border border-red-200 flex flex-col justify-center mb-2 md:mb-0 bg-white p-4 md:p-8">
                                 <div className="flex flex-col items-center justify-center h-full">
-                                    <span className="text-red-900 text-3xl md:text-5xl text-center font-black font-extrabold mb-12">Achievement</span>
-                                    <span className="text-red-600 text-[70px] xl:text-[130px] font-black text-center font-bigNumbers">{getAchievement()}%</span>
+                                    <span className="text-red-900 text-3xl md:text-5xl text-center font-black font-extrabold mb-12">
+                                        Achievement
+                                    </span>
+                                    <span className="text-red-600 text-[70px] xl:text-[130px] font-black text-center font-bigNumbers">
+                                        {getAchievement()}%
+                                    </span>
+
+                                    {/* Achievement Bar */}
+                                    <div className="w-full bg-gray-200 rounded-full h-6 mt-[5rem]">
+                                        <div
+                                            className="bg-red-500 h-6 rounded-full" // Choose your bar color (e.g., bg-green-500)
+                                            style={{ width: `${getAchievement()}%` }}
+                                        ></div>
+                                    </div>
                                 </div>
                             </div>
                             <div className="w-full  min-h-[16rem] h-auto shadow-md rounded-xl border border-red-200 flex justify-center bg-white overflow-x-auto">
