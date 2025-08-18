@@ -6,7 +6,7 @@ import IconCalendar from '../components/Icon/IconCalendar';
 import mayoraimg from '../../public/assets/images/logo2.png';
 import { Link } from 'react-router-dom';
 
-const ComponentCounter = ({ line, url, label, nameOpsi = null}) => {
+const ComponentCounter2a = ({ line, url, label, nameOpsi = null}) => {
     const [currentTime, setCurrentTime] = useState(new Date());
     const [currentShift, setCurrentShift] = useState(null);
     const [packingData, setPackingData] = useState({ cntr_carton: 0 });
@@ -41,15 +41,19 @@ const ComponentCounter = ({ line, url, label, nameOpsi = null}) => {
     };
 
     const TOTAL_CARTON = {
-        l1: 1016,
-        l2: 1368,
+        l1: 1120,
+        l2: 1512,
+        l2at: 3251,
+        l2ar : 6096,
         l5: 6640,
-        l6: 2312,
+        l6: 2432,
         l7: 2432,
     };
     const TOTAL_CARTON_Sabtu = {
         l1: 630,
         l2: 473,
+        l2at: 3251,
+        l2ar : 6096,
         l5: 4150,
         l6: 1330,
         l7: 1330,
@@ -199,12 +203,15 @@ const ComponentCounter = ({ line, url, label, nameOpsi = null}) => {
                             <Link to="/biscuit" className="items-center">
                                 <h1 className="text-white text-lg 2xl:text-[15px] font-black dark:text-white-light pr-3">BSC</h1>
                             </Link>
+                            {/* <Link to="/mks_l2a" className="items-center">
+                                <h1 className="text-white text-lg 2xl:text-[15px] font-black dark:text-white-light pr-3">MKS</h1>
+                            </Link> */}
                             <Link to="/tcw" className="items-center">
                                 <h1 className="text-white text-lg 2xl:text-[15px] font-black dark:text-white-light">TCW</h1>
                             </Link>
                         </div>
                         <div className="flex flex-row items-center">
-                            <h1 className="text-white text-5xl 2xl:text-[50px] font-black font-bigNumbers mt-4">  {(nameOpsi != null ? nameOpsi : label)} LINE {line.slice(-1)}</h1>
+                            <h1 className="text-white text-5xl 2xl:text-[50px] font-black font-bigNumbers mt-4">  {(nameOpsi != null ? nameOpsi : label)} LINE {line.slice(-2)}</h1>
                             <Link to={url} className="flex items-center mt-4">
                                 <IconArrowLeft className="h-[100px] w-[100px] text-white" />
                             </Link>
@@ -308,4 +315,4 @@ const ComponentCounter = ({ line, url, label, nameOpsi = null}) => {
     );
 };
 
-export default ComponentCounter;
+export default ComponentCounter2a;

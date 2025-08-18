@@ -30,7 +30,6 @@ const Index_2 = () => {
             });
         }
     };
-
     const [urlapi] = useState({
         packingl1_shift1: 'http://10.37.12.17:3000/shift1_l1_hourly',
         packingl1_shift2: 'http://10.37.12.17:3000/shift2_l1_hourly',
