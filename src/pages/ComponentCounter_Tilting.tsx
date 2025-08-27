@@ -29,7 +29,7 @@ const TOTAL_CARTON = {
     l1: 1016,
     l2: 1368,
     l5: 6640,
-    l6: 2312,
+    l6: 2432,
     l7: 2432,
 };
 const TOTAL_CARTON_Sabtu = {
@@ -265,12 +265,12 @@ const ComponentCounter: React.FC<ComponentCounterProps> = ({ line, url, label, n
                                                     return (
                                                         <tr key={idx} className="hover:bg-red-50 transition">
                                                             <td
-                                                                className={`border border-red-400 text-red-900 font-extrabold w-1/5 text-2xl md:text-4xl lg:text-6xl ${idx > 4 ? 'text-5xl' : 'text-6xl'}`}
+                                                                className={`border border-red-400 text-red-900 font-extrabold w-1/5 ${hourlyData.length > 4 ? 'text-5xl' : 'text-6xl'}`}
                                                             >
                                                                 {idx + 1}
                                                             </td>
-                                                            <td className={`border border-red-400 text-red-900 font-extrabold w-3/5 text-2xl md:text-4xl lg:text-6xl ${idx > 4 ? 'text-5xl' : 'text-6xl'}`}>
-                                                                <div className="flex flex-col items-center justify-center">
+                                                            <td className={`border border-red-400 text-red-900 font-extrabold w-3/5 ${hourlyData.length > 4 ? 'text-5xl' : 'text-6xl'}`}>
+                                                                <div className="flex flex-row items-center justify-center">
                                                                     <h3>{carton}</h3>
                                                                     <h3>({percent}%)</h3>
                                                                 </div>

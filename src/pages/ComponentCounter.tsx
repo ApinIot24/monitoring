@@ -44,7 +44,7 @@ const ComponentCounter = ({ line, url, label, nameOpsi = null}) => {
         l1: 1016,
         l2: 1368,
         l5: 6640,
-        l6: 2312,
+        l6: 2432,
         l7: 2432,
     };
     const TOTAL_CARTON_Sabtu = {
