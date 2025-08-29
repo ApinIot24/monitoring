@@ -1,5 +1,5 @@
 import React from 'react';
-import ComponentCounter from './ComponentCounter';
+import ComponentCounter from './ComponentCounter_NEW';
 
 const tcw = () => {
     const lines = ['l7', 'l6']; // Sesuaikan dengan line yang ingin ditampilkan

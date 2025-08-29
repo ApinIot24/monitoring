@@ -1,5 +1,5 @@
 import React from 'react';
-import ComponentCounter from './ComponentCounter';
+import ComponentCounter from './ComponentCounter_NEW';
 
 const Index = () => {
     const lines = ['l1', 'l2']; // Sesuaikan dengan line yang ingin ditampilkan

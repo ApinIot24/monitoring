@@ -2,7 +2,7 @@ import React from 'react';
 import ComponentCounter from './ComponentCounter_Tilting';
 
 const Index = () => {
-    const lines = ['l1'];
+    const lines = ['l1','l7'];
 
     return (
         <div className="flex items-center justify-center flex-wrap xl:flex-nowrap">

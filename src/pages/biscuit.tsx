@@ -1,5 +1,5 @@
 import React from 'react';
-import ComponentCounter from './ComponentCounter';
+import ComponentCounter from './ComponentCounter_NEW';
 
 const biscuit = () => {
     const lines = ['l5']; // Sesuaikan dengan line yang ingin ditampilkan
