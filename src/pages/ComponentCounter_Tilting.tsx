@@ -15,7 +15,7 @@ interface ComponentCounterProps {
 }
 
 interface PackingData {
-    cntr_carton: number;
+    cntr_tilting: number;
 }
 
 interface ShiftData {
@@ -28,14 +28,14 @@ interface ShiftData {
 const TOTAL_CARTON = {
     l1: 1016,
     l2: 1368,
-    l5: 6640,
+    l5: 85,
     l6: 2432,
     l7: 2432,
 };
 const TOTAL_CARTON_Sabtu = {
     l1: 630,
     l2: 473,
-    l5: 4150,
+    l5: 85,
     l6: 1330,
     l7: 1330,
 };
@@ -43,7 +43,7 @@ const TOTAL_CARTON_Sabtu = {
 const ComponentCounter: React.FC<ComponentCounterProps> = ({ line, url, label, nameOpsi = null }) => {
     const [currentTime, setCurrentTime] = useState<Date>(new Date());
     const [currentShift, setCurrentShift] = useState<number | null>(null);
-    const [packingData, setPackingData] = useState<PackingData>({ cntr_carton: 0 });
+    const [packingData, setPackingData] = useState<PackingData>({ cntr_tilting: 0 });
     const [shiftData, setShiftData] = useState<ShiftData>({ shift1: 0, shift2: 0, shift3: 0 });
     const [hourlyData, setHourlyData] = useState<number[]>([]);
     const [isLoading, setLoading] = useState<boolean>(true);
@@ -67,12 +67,12 @@ const ComponentCounter: React.FC<ComponentCounterProps> = ({ line, url, label, n
 
 
     const APIURLs = {
-        packing: `http://10.37.12.17:3000/packing_${line}`,
-        shift: `http://10.37.12.17:3000/shift_${line}`,
+        packing: `http://10.37.12.17:3000/tilting_${line}`,
+        shift: `http://10.37.12.17:3000/shift_${line}_tilting`,
         hourly: {
-            shift1: `http://10.37.12.17:3000/shift1_${line}_hourly`,
-            shift2: `http://10.37.12.17:3000/shift2_${line}_hourly`,
-            shift3: `http://10.37.12.17:3000/shift3_${line}_hourly`,
+            shift1: `http://10.37.12.17:3000/shift1_${line}_tilting_hourly`,
+            shift2: `http://10.37.12.17:3000/shift2_${line}_tilting_hourly`,
+            shift3: `http://10.37.12.17:3000/shift3_${line}_tilting_hourly`,
         },
     };
 
@@ -80,7 +80,7 @@ const ComponentCounter: React.FC<ComponentCounterProps> = ({ line, url, label, n
     const fetchPackingData = async () => {
         try {
             const response = await axios.get(APIURLs.packing);
-            setPackingData(response.data[0] || { cntr_carton: 0 });
+            setPackingData(response.data[0] || { cntr_tilting: 0 });
         } catch (err) {
             console.error(err);
             setError('Gagal memuat data packing');
@@ -142,8 +142,8 @@ const ComponentCounter: React.FC<ComponentCounterProps> = ({ line, url, label, n
                 return;
             }
             const response = await axios.get(shiftData.url);
-            const calcDiff = (data: { cntr_carton: number }[]) =>
-                data.map((val, i) => (i === 0 ? val.cntr_carton : val.cntr_carton - data[i - 1].cntr_carton));
+            const calcDiff = (data: { cntr_tilting: number }[]) =>
+                data.map((val, i) => (i === 0 ? val.cntr_tilting : val.cntr_tilting - data[i - 1].cntr_tilting));
             setHourlyData(calcDiff(response.data));
             setCurrentShift(shiftData.shift);
         } catch (err) {
@@ -179,7 +179,7 @@ const ComponentCounter: React.FC<ComponentCounterProps> = ({ line, url, label, n
         setLoading(false);
     }, [packingData, shiftData, hourlyData]);
 
-    const getTotalPacked = (): number => packingData.cntr_carton;
+    const getTotalPacked = (): number => packingData.cntr_tilting;
     const getAchievement = (): number => {
         const total = getTotalCarton(line);
         return Math.round((getTotalPacked() / total) * 100);
