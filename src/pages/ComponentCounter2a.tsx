@@ -190,7 +190,6 @@ const ComponentCounter2a = ({ line, url, label, nameOpsi = null}) => {
     };
 
 
-
     return (
         <div>
             <div className="mb-5 flex items-center justify-center flex-wrap xl:flex-nowrap">
