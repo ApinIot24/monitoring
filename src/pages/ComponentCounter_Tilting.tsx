@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import IconArrowLeft from '../components/Icon/IconArrowLeft';
@@ -15,27 +14,27 @@ interface ComponentCounterProps {
 }
 
 interface PackingData {
-    cntr_tilting: number;
+    cntr_tilting: number;  // Perubahan di sini
 }
 
 interface ShiftData {
-    shift1: number;
-    shift2: number;
-    shift3: number;
+    shift1: string;  // Variance berupa string (contoh: "99.34")
+    shift2: string;
+    shift3: string;
 }
-
 
 const TOTAL_CARTON = {
     l1: 1016,
     l2: 1368,
-    l5: 85,
+    l5: 85,  // Perubahan di sini
     l6: 2432,
     l7: 2432,
 };
+
 const TOTAL_CARTON_Sabtu = {
     l1: 630,
     l2: 473,
-    l5: 85,
+    l5: 85,  // Perubahan di sini
     l6: 1330,
     l7: 1330,
 };
@@ -44,7 +43,7 @@ const ComponentCounter: React.FC<ComponentCounterProps> = ({ line, url, label, n
     const [currentTime, setCurrentTime] = useState<Date>(new Date());
     const [currentShift, setCurrentShift] = useState<number | null>(null);
     const [packingData, setPackingData] = useState<PackingData>({ cntr_tilting: 0 });
-    const [shiftData, setShiftData] = useState<ShiftData>({ shift1: 0, shift2: 0, shift3: 0 });
+    const [shiftData, setShiftData] = useState<ShiftData>({ shift1: "0", shift2: "0", shift3: "0" });  // Inisialisasi dengan string
     const [hourlyData, setHourlyData] = useState<number[]>([]);
     const [isLoading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
@@ -65,17 +64,15 @@ const ComponentCounter: React.FC<ComponentCounterProps> = ({ line, url, label, n
         }
     };
 
-
     const APIURLs = {
         packing: `http://10.37.12.17:3000/tilting_${line}`,
-        shift: `http://10.37.12.17:3000/shift_${line}_tilting`,
+        shift: `http://10.37.12.17:3000/tilting_${line}_variance_per_shift`,  // Perubahan di sini
         hourly: {
             shift1: `http://10.37.12.17:3000/shift1_${line}_tilting_hourly`,
             shift2: `http://10.37.12.17:3000/shift2_${line}_tilting_hourly`,
             shift3: `http://10.37.12.17:3000/shift3_${line}_tilting_hourly`,
         },
     };
-
 
     const fetchPackingData = async () => {
         try {
@@ -90,7 +87,17 @@ const ComponentCounter: React.FC<ComponentCounterProps> = ({ line, url, label, n
     const fetchShiftData = async () => {
         try {
             const response = await axios.get(APIURLs.shift);
-            setShiftData(response.data[0] || { shift1: 0, shift2: 0, shift3: 0 });
+            // Asumsikan response.data memiliki struktur:
+            // { Jumlah_batch: { shift1, shift2, shift3 }, jumlah_karton: { shift1, shift2, shift3 }, variance_shift1, variance_shift2, variance_shift3 }
+            if (response.data) {
+                setShiftData({
+                    shift1: response.data.variance_shift1 || "0",  // Pastikan default value
+                    shift2: response.data.variance_shift2 || "0",
+                    shift3: response.data.variance_shift3 || "0",
+                });
+            } else {
+                setShiftData({ shift1: "0", shift2: "0", shift3: "0" });
+            }
         } catch (err) {
             console.error(err);
             setError('Gagal memuat data shift');
@@ -160,13 +167,18 @@ const ComponentCounter: React.FC<ComponentCounterProps> = ({ line, url, label, n
         return TOTAL_CARTON[line] || 1000;
     };
 
-
-
     useEffect(() => {
         setLoading(true);
-        fetchPackingData();
-        fetchShiftData();
-        fetchHourlyData();
+        Promise.all([
+            fetchPackingData(),
+            fetchShiftData(),
+            fetchHourlyData()
+        ]).then(() => setLoading(false))
+            .catch(() => {
+                setError("Gagal memuat data");
+                setLoading(false);
+            });
+
         const interval = setInterval(() => {
             fetchPackingData();
             fetchShiftData();
@@ -175,17 +187,11 @@ const ComponentCounter: React.FC<ComponentCounterProps> = ({ line, url, label, n
         return () => clearInterval(interval);
     }, [line, retryCount]);
 
-    useEffect(() => {
-        setLoading(false);
-    }, [packingData, shiftData, hourlyData]);
-
     const getTotalPacked = (): number => packingData.cntr_tilting;
     const getAchievement = (): number => {
         const total = getTotalCarton(line);
         return Math.round((getTotalPacked() / total) * 100);
     };
-
-
 
     const ErrorDisplay = ({ message, onRetry }: { message: string, onRetry: () => void }) => (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative animate-fade-in" role="alert" aria-label="Error">
@@ -201,10 +207,8 @@ const ComponentCounter: React.FC<ComponentCounterProps> = ({ line, url, label, n
         </div>
     );
 
-    // --- Main Render ---
     return (
         <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-red-100 animate-fade-in">
-            {/* Loading and Error UI */}
             {isLoading && (
                 <div className="flex justify-center items-center h-screen">
                     <div className="text-3xl text-red-600 font-bold animate-fade-in">Loading...</div>
@@ -215,7 +219,6 @@ const ComponentCounter: React.FC<ComponentCounterProps> = ({ line, url, label, n
                     <ErrorDisplay message={error} onRetry={() => { setError(null); setRetryCount(retryCount + 1); }} />
                 </div>
             )}
-            {/* Main UI */}
             {!isLoading && !error && (
                 <main className="flex flex-col items-center justify-center flex-wrap xl:flex-nowrap animate-fade-in">
                     <div className="w-full max-w-6xl bg-white shadow-lg rounded-xl border border-red-200 dark:border-[#1b2e4b] dark:bg-[#191e3a] dark:shadow-none overflow-hidden">
@@ -253,11 +256,9 @@ const ComponentCounter: React.FC<ComponentCounterProps> = ({ line, url, label, n
                                         <span className="text-red-600 text-[70px] xl:text-[130px] font-black text-center font-bigNumbers">
                                             {getAchievement()}%
                                         </span>
-
-                                        {/* Achievement Bar */}
                                         <div className="w-full bg-gray-200 rounded-full h-6 mt-[5rem]">
                                             <div
-                                                className="bg-red-500 h-6 rounded-full" // Choose your bar color (e.g., bg-green-500)
+                                                className="bg-red-500 h-6 rounded-full"
                                                 style={{ width: `${getAchievement()}%` }}
                                             ></div>
                                         </div>
@@ -266,7 +267,6 @@ const ComponentCounter: React.FC<ComponentCounterProps> = ({ line, url, label, n
                             </div>
                         </section>
                         <section className="flex flex-col md:flex-row items-center mb-2 gap-6 bg-gradient-to-br from-white via-red-50 to-red-100 p-6">
-                         
                             <div className="w-full  min-h-[16rem] h-auto shadow-md rounded-xl border border-red-200 flex justify-center bg-white overflow-x-auto">
                                 <table className="w-full text-center border-collapse text-sm md:text-base lg:text-lg">
                                     <thead>
@@ -275,18 +275,16 @@ const ComponentCounter: React.FC<ComponentCounterProps> = ({ line, url, label, n
                                                 <h4 className="text-red-900 text-base md:text-2xl font-extrabold">SHIFT</h4>
                                             </th>
                                             <th className="border border-red-400 px-2 py-2 bg-red-100 whitespace-nowrap">
-                                                <h4 className="text-red-900 text-base md:text-2xl font-extrabold">Tilting</h4>
+                                                <h4 className="text-red-900 text-base md:text-2xl font-extrabold">Variance</h4>  {/* Ubah jadi Variance */}
                                             </th>
                                         </tr>
                                     </thead>
                                     <tbody className='font-bigNumbers'>
-                                        {Object.entries(shiftData).map(([shift, carton]) => {
-                                            const maxCarton = getTotalCarton(line);
-                                            const percent = ((carton / maxCarton) * 100).toFixed(1);
+                                        {Object.entries(shiftData).map(([shift, variance]) => {  // Ubah carton jadi variance
                                             return (
                                                 <tr key={shift} className="hover:bg-red-50 transition">
                                                     <td className="border border-red-400 text-red-900 font-extrabold w-1/5 text-2xl md:text-4xl lg:text-5xl">{shift.slice(-1)}</td>
-                                                    <td className="border border-red-400 text-red-900 font-extrabold w-3/5 text-2xl md:text-4xl lg:text-5xl">{carton} ({percent}%)</td>
+                                                    <td className="border border-red-400 text-red-900 font-extrabold w-3/5 text-2xl md:text-4xl lg:text-5xl">{variance}%</td>  {/* Tampilkan variance */}
                                                 </tr>
                                             );
                                         })}
@@ -297,7 +295,6 @@ const ComponentCounter: React.FC<ComponentCounterProps> = ({ line, url, label, n
                     </div>
                 </main>
             )}
-            {/* Animation CSS */}
             <style>{`
                 @keyframes fadeIn {
                     from { opacity: 0; }
