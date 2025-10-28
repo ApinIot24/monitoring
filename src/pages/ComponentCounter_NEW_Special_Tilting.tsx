@@ -261,7 +261,7 @@ const ComponentCounter: React.FC<ComponentCounterProps> = ({ line, url, label, n
                                         <img src={mayoraimg} alt="Logo Mayora" className="h-[40px] md:h-[70px] lg:h-[100px]" />
                                     </button>
                                 </div>
-                                <h1 className="text-white text-4xl md:text-5xl 2xl:text-[50px] font-black font-bigNumbers mt-4" aria-label="Counter">{getTotalCarton(line)} COUNTER</h1>
+                                <h1 className="text-white text-4xl md:text-5xl 2xl:text-[50px] font-black font-bigNumbers mt-4" aria-label="Counter">{getTotalCarton(line)} CARTON</h1>
                             </div>
                             <div className="text-white text-left font-bigNumbers font-bold p-6 pt-0 mt-auto w-full flex flex-col md:flex-row justify-between items-center">
                                 <h3 className="text-2xl md:text-3xl flex flex-row items-center" aria-label="Shift dan Waktu"> Shift : {currentShift}  <IconCalendar className='ml-2' />  {currentTime.toLocaleDateString('id-ID')}  <IconClock className='ml-2' /> {currentTime.toLocaleTimeString()}</h3>
@@ -276,19 +276,15 @@ const ComponentCounter: React.FC<ComponentCounterProps> = ({ line, url, label, n
                                         <h4 className="text-red-900 text-3xl md:text-5xl text-center font-extrabold mt-[150px]">CARTON</h4>
                                     </div>
                                 </div>
-                                <div className="w-full min-h-[16rem] h-auto shadow-md rounded-xl border border-red-200 flex flex-col justify-center mb-2 md:mb-0 bg-white p-4 md:p-8">
-                                    <div className="flex flex-col items-center justify-center h-full">
-                                        <span className="text-red-900 text-3xl md:text-5xl text-center font-black font-extrabold mb-12">
-                                            Achievement
-                                        </span>
-                                        <span className="text-red-600 text-[70px] xl:text-[130px] font-black text-center font-bigNumbers">
-                                            {getAchievement()}%
-                                        </span>
-
-                                        {/* Achievement Bar */}
-                                        <div className="w-full bg-gray-200 rounded-full h-6 mt-[5rem]">
+                                <div className="w-full  min-h-[16rem] h-auto shadow-md rounded-xl border border-red-200 flex flex-col items-center mb-2 bg-white">
+                                    <h4 className="text-red-900 text-3xl md:text-5xl mt-4 text-center font-black font-extrabold mb-2">
+                                        Achievement
+                                    </h4>
+                                    <div className="flex flex-col items-center justify-center h-full p-3">
+                                        <span className="text-red-600 text-[70px] xl:text-[170px] font-black text-center mt-[120px] font-bigNumbers"> {getAchievement()}% </span>
+                                        <div className="w-full bg-gray-200 rounded-full h-6  mt-[150px]">
                                             <div
-                                                className="bg-red-500 h-6 rounded-full" // Choose your bar color (e.g., bg-green-500)
+                                                className="bg-red-500 h-6 rounded-full"
                                                 style={{ width: `${getAchievement()}%` }}
                                             ></div>
                                         </div>
@@ -297,7 +293,7 @@ const ComponentCounter: React.FC<ComponentCounterProps> = ({ line, url, label, n
                             </div>
                         </section>
                         <section className="flex flex-col md:flex-row items-center mb-2 gap-6 bg-gradient-to-br from-white via-red-50 to-red-100 p-6">
-                         <div className="w-full  min-h-[16rem] h-auto shadow-md rounded-xl border border-red-200 flex justify-center bg-white overflow-x-auto">
+                            <div className="w-full  min-h-[16rem] h-auto shadow-md rounded-xl border border-red-200 flex justify-center bg-white overflow-x-auto">
                                 <table className="w-full text-center border-collapse text-sm md:text-base lg:text-lg">
                                     <thead>
                                         <tr>
@@ -316,32 +312,27 @@ const ComponentCounter: React.FC<ComponentCounterProps> = ({ line, url, label, n
                                             return (
                                                 <tr key={shift} className="hover:bg-red-50 transition">
                                                     <td className="border border-red-400 text-red-900 font-extrabold w-1/5 text-2xl md:text-4xl lg:text-5xl">{shift.slice(-1)}</td>
-                                                    <td className="border border-red-400 text-red-900 font-extrabold w-3/5 text-2xl md:text-4xl lg:text-5xl">{carton} ({percent}%)</td>
+                                                    <td className="border border-red-400 text-red-900 font-extrabold w-3/5 text-2xl md:text-4xl lg:text-5xl" style={{ whiteSpace: 'nowrap' }}>{carton} ({percent}%)</td>
                                                 </tr>
                                             );
                                         })}
                                     </tbody>
                                 </table>
                             </div>
-                               <div className="w-full min-h-[16rem] h-auto shadow-md rounded-xl border border-red-200 flex flex-col justify-center mb-2 md:mb-0 bg-white p-4 md:p-8">
-                                <div className="flex flex-col items-center justify-center h-full">
-                                    <span className="text-red-900 text-3xl md:text-5xl text-center font-black font-extrabold mb-12">
-                                      Variance
-                                    </span>
-                                    {/* Tampilkan variancePercentage */}
-                                    <span className="text-red-600 text-[20px] xl:text-[110px] font-black text-center font-bigNumbers">
-                                        {variancePercentage}%
-                                    </span>
-
-                                    {/* Achievement Bar */}
-                                    <div className="w-full bg-gray-200 rounded-full h-6 mt-[5rem]">
-                                        <div
-                                            className="bg-red-500 h-6 rounded-full" // Choose your bar color (e.g., bg-green-500)
-                                            style={{ width: `${variancePercentage}%` }}
-                                        ></div>
+                           <div className="w-full  min-h-[16rem] h-auto shadow-md rounded-xl border border-red-200 flex flex-col items-center mb-2 bg-white">
+                                    <h4 className="text-red-900 text-3xl md:text-5xl mt-4 text-center font-black font-extrabold mb-2">
+                                        Variance
+                                    </h4>
+                                    <div className="flex flex-col items-center justify-center h-full p-3">
+                                        <span className="text-red-600 text-[70px] xl:text-[110px] font-black text-center mt-[80px] font-bigNumbers"> {variancePercentage}% </span>
+                                        <div className="w-full bg-gray-200 rounded-full h-6 mt-[80px]">
+                                            <div
+                                                className="bg-red-500 h-6 rounded-full"
+                                                style={{ width: `${variancePercentage}%` }}
+                                            ></div>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
                         </section>
                     </div>
                 </main>

@@ -26,7 +26,7 @@ interface ShiftData {
 const TOTAL_CARTON = {
     l1: 1016,
     l2: 1368,
-    l5: 85,  // Perubahan di sini
+    l5: 84,  // Perubahan di sini
     l6: 2432,
     l7: 2432,
 };
@@ -224,7 +224,7 @@ const ComponentCounter: React.FC<ComponentCounterProps> = ({ line, url, label, n
                     <div className="w-full max-w-6xl bg-white shadow-lg rounded-xl border border-red-200 dark:border-[#1b2e4b] dark:bg-[#191e3a] dark:shadow-none overflow-hidden">
                         <header className="p-2 bg-gradient-to-r from-red-600 via-red-500 to-red-400 flex flex-col items-center shadow-md">
                             <div className="flex flex-col md:flex-row items-center w-full justify-between">
-                                <h1 className="text-white text-4xl md:text-5xl 2xl:text-[50px] font-black font-bigNumbers mt-4" aria-label="Judul">{(nameOpsi != null ? nameOpsi : label)} Tilting {line.slice(-1)}</h1>
+                                <h1 className="text-white text-4xl md:text-5xl 2xl:text-[50px] font-black font-bigNumbers mt-4" aria-label="Judul">{(nameOpsi != null ? nameOpsi : label)} TILTING  {line.slice(-1)}</h1>
                                 <div className="flex items-center gap-4 mt-4 md:mt-0">
                                     <Link to={url} className="flex items-center" aria-label="Kembali">
                                         <IconArrowLeft className="h-[60px] w-[60px] text-white" />
@@ -233,7 +233,7 @@ const ComponentCounter: React.FC<ComponentCounterProps> = ({ line, url, label, n
                                         <img src={mayoraimg} alt="Logo Mayora" className="h-[40px] md:h-[70px] lg:h-[100px]" />
                                     </button>
                                 </div>
-                                <h1 className="text-white text-4xl md:text-5xl 2xl:text-[50px] font-black font-bigNumbers mt-4" aria-label="Counter">{getTotalCarton(line)} Counter</h1>
+                                <h1 className="text-white text-4xl md:text-5xl 2xl:text-[50px] font-black font-bigNumbers mt-4" aria-label="Counter">{getTotalCarton(line)} BATCH</h1>
                             </div>
                             <div className="text-white text-left font-bigNumbers font-bold p-6 pt-0 mt-auto w-full flex flex-col md:flex-row justify-between items-center">
                                 <h3 className="text-2xl md:text-3xl flex flex-row items-center" aria-label="Shift dan Waktu"> Shift : {currentShift}  <IconCalendar className='ml-2' />  {currentTime.toLocaleDateString('id-ID')}  <IconClock className='ml-2' /> {currentTime.toLocaleTimeString()}</h3>
@@ -248,15 +248,14 @@ const ComponentCounter: React.FC<ComponentCounterProps> = ({ line, url, label, n
                                         <h4 className="text-red-900 text-3xl md:text-5xl text-center font-extrabold mt-[150px]">Tilting</h4>
                                     </div>
                                 </div>
-                                <div className="w-full min-h-[16rem] h-auto shadow-md rounded-xl border border-red-200 flex flex-col justify-center mb-2 md:mb-0 bg-white p-4 md:p-8">
-                                    <div className="flex flex-col items-center justify-center h-full">
-                                        <span className="text-red-900 text-3xl md:text-5xl text-center font-black font-extrabold mb-12">
-                                            Achievement
-                                        </span>
-                                        <span className="text-red-600 text-[70px] xl:text-[130px] font-black text-center font-bigNumbers">
-                                            {getAchievement()}%
-                                        </span>
-                                        <div className="w-full bg-gray-200 rounded-full h-6 mt-[5rem]">
+                                <div className="w-full  min-h-[16rem] h-auto shadow-md rounded-xl border border-red-200 flex flex-col items-center mb-2 bg-white">
+
+                                    <h4 className="text-red-900 text-3xl md:text-5xl mt-4 text-center font-black font-extrabold mb-2">
+                                        Achievement
+                                    </h4>
+                                    <div className="flex flex-col items-center justify-center h-full p-3">
+                                        <span className="text-red-600 text-[70px] xl:text-[170px] font-black text-center mt-[120px] font-bigNumbers"> {getAchievement()}% </span>
+                                        <div className="w-full bg-gray-200 rounded-full h-6  mt-[150px]">
                                             <div
                                                 className="bg-red-500 h-6 rounded-full"
                                                 style={{ width: `${getAchievement()}%` }}
@@ -283,8 +282,8 @@ const ComponentCounter: React.FC<ComponentCounterProps> = ({ line, url, label, n
                                         {Object.entries(shiftData).map(([shift, variance]) => {  // Ubah carton jadi variance
                                             return (
                                                 <tr key={shift} className="hover:bg-red-50 transition">
-                                                    <td className="border border-red-400 text-red-900 font-extrabold w-1/5 text-2xl md:text-4xl lg:text-5xl">{shift.slice(-1)}</td>
-                                                    <td className="border border-red-400 text-red-900 font-extrabold w-3/5 text-2xl md:text-4xl lg:text-5xl">{variance}%</td>  {/* Tampilkan variance */}
+                                                    <td className="border border-red-400 text-red-900 font-extrabold w-1/5 text-2xl md:text-4xl lg:text-6xl">{shift.slice(-1)}</td>
+                                                    <td className="border border-red-400 text-red-900 font-extrabold w-3/5 text-2xl md:text-4xl lg:text-[60px]" style={{ whiteSpace: 'nowrap' }}>{variance}%</td>  {/* Tampilkan variance */}
                                                 </tr>
                                             );
                                         })}
@@ -293,7 +292,7 @@ const ComponentCounter: React.FC<ComponentCounterProps> = ({ line, url, label, n
                             </div>
                         </section>
                     </div>
-                </main>
+                </main >
             )}
             <style>{`
                 @keyframes fadeIn {
@@ -304,7 +303,7 @@ const ComponentCounter: React.FC<ComponentCounterProps> = ({ line, url, label, n
                     animation: fadeIn 0.5s ease-out;
                 }
             `}</style>
-        </div>
+        </div >
     );
 };
 

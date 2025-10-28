@@ -27,14 +27,14 @@ interface ShiftData {
 
 const TOTAL_CARTON = {
     l1: 1016,
-    l2: 1368,
+    l2: 1016,
     l5: 6640,
     l6: 2432,
     l7: 2432,
 };
 const TOTAL_CARTON_Sabtu = {
     l1: 630,
-    l2: 473,
+    l2: 630,
     l5: 4150,
     l6: 1330,
     l7: 1330,
