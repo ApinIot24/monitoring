@@ -6,6 +6,8 @@ const Index2 = lazy(() => import('../pages/Index_2'));
 const Index3 = lazy(() => import('../pages/Index_3'));
 const MKSL2a = lazy(() => import('../pages/mks_l2a'));
 const TilTing = lazy(() => import('../pages/tilting'));
+const Report = lazy(() => import('../pages/Report'));
+const CAW = lazy(() => import('../pages/CAW'));
 
 const routes = [
     // dashboard
@@ -35,14 +37,24 @@ const routes = [
         layout: 'default',
     },
     {
-         path: '/mks_l2a',
+        path: '/mks_l2a',
         element: <MKSL2a />,
-        layout: 'default',    
+        layout: 'default',
     },
     {
-         path: '/tilting',
+        path: '/tilting',
         element: <TilTing />,
-        layout: 'default',    
+        layout: 'default',
+    },
+    {
+        path: '/report',
+        element: <Report />,
+        layout: 'default',
+    },
+     {
+        path: '/CAW',
+        element: <CAW />,
+        layout: 'default',
     }
 ];
 
