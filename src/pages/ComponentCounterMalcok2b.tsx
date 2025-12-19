@@ -57,12 +57,12 @@ const ComponentCounterMalcok2b: React.FC<ComponentCounterProps> = ({ line, url, 
 
     // Dynamic API sesuai pattern lo:
     const API = {
-        packing: `http://10.37.12.17:3000/packing${line}`,
-        shift: `http://10.37.12.17:3000/shift_l2b`,
+        packing: `http://10.37.12.34:3000/packing${line}`,
+        shift: `http://10.37.12.34:3000/shift_l2b`,
         hourly: {
-            shift1: `http://10.37.12.17:3000/shift1${line}_hourly`,
-            shift2: `http://10.37.12.17:3000/shift2${line}_hourly`,
-            shift3: `http://10.37.12.17:3000/shift3${line}_hourly`,
+            shift1: `http://10.37.12.34:3000/shift1${line}_hourly`,
+            shift2: `http://10.37.12.34:3000/shift2${line}_hourly`,
+            shift3: `http://10.37.12.34:3000/shift3${line}_hourly`,
         },
     };
 
