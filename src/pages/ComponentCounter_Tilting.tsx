@@ -65,12 +65,12 @@ const ComponentCounter: React.FC<ComponentCounterProps> = ({ line, url, label, n
     };
 
     const APIURLs = {
-        packing: `http://10.37.12.17:3000/tilting_${line}`,
-        shift: `http://10.37.12.17:3000/tilting_${line}_variance_per_shift`,  // Perubahan di sini
+        packing: `http://10.37.12.34:3000/tilting_${line}`,
+        shift: `http://10.37.12.34:3000/tilting_${line}_variance_per_shift`,  // Perubahan di sini
         hourly: {
-            shift1: `http://10.37.12.17:3000/shift1_${line}_tilting_hourly`,
-            shift2: `http://10.37.12.17:3000/shift2_${line}_tilting_hourly`,
-            shift3: `http://10.37.12.17:3000/shift3_${line}_tilting_hourly`,
+            shift1: `http://10.37.12.34:3000/shift1_${line}_tilting_hourly`,
+            shift2: `http://10.37.12.34:3000/shift2_${line}_tilting_hourly`,
+            shift3: `http://10.37.12.34:3000/shift3_${line}_tilting_hourly`,
         },
     };
 
