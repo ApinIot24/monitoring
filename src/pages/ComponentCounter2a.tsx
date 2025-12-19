@@ -6,14 +6,31 @@ import IconCalendar from '../components/Icon/IconCalendar';
 import mayoraimg from '../../public/assets/images/logo2.png';
 import { Link } from 'react-router-dom';
 
-const ComponentCounter2a = ({ line, url, label, nameOpsi = null}) => {
+interface ComponentCounter2aProps {
+    line: string;
+    url: string;
+    label: string;
+    nameOpsi?: string | null;
+}
+
+interface PackingData {
+    cntr_carton: number;
+}
+
+interface ShiftData {
+    shift1: number;
+    shift2: number;
+    shift3: number;
+}
+
+const ComponentCounter2a = ({ line, url, label, nameOpsi = null }: ComponentCounter2aProps) => {
     const [currentTime, setCurrentTime] = useState(new Date());
-    const [currentShift, setCurrentShift] = useState(null);
-    const [packingData, setPackingData] = useState({ cntr_carton: 0 });
-    const [shiftData, setShiftData] = useState({ shift1: 0, shift2: 0, shift3: 0 });
-    const [hourlyData, setHourlyData] = useState([]);
+    const [currentShift, setCurrentShift] = useState<number | null>(null);
+    const [packingData, setPackingData] = useState<PackingData>({ cntr_carton: 0 });
+    const [shiftData, setShiftData] = useState<ShiftData>({ shift1: 0, shift2: 0, shift3: 0 });
+    const [hourlyData, setHourlyData] = useState<number[]>([]);
     const [isLoading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -40,20 +57,20 @@ const ComponentCounter2a = ({ line, url, label, nameOpsi = null}) => {
         }
     };
 
-    const TOTAL_CARTON = {
+    const TOTAL_CARTON: Record<string, number> = {
         l1: 1120,
         l2: 1512,
         l2at: 3251,
-        l2ar : 6096,
+        l2ar: 6096,
         l5: 6640,
         l6: 2432,
         l7: 2432,
     };
-    const TOTAL_CARTON_Sabtu = {
+    const TOTAL_CARTON_Sabtu: Record<string, number> = {
         l1: 630,
         l2: 473,
         l2at: 3251,
-        l2ar : 6096,
+        l2ar: 6096,
         l5: 4150,
         l6: 1330,
         l7: 1330,
@@ -139,20 +156,41 @@ const ComponentCounter2a = ({ line, url, label, nameOpsi = null}) => {
 
         try {
             const shiftData = getShiftURL();
+            if (!shiftData.url || !shiftData.shift) {
+                setHourlyData([]);
+                setCurrentShift(null);
+                return;
+            }
+            
             const response = await axios.get(shiftData.url);
+            
+            if (!response.data || !Array.isArray(response.data) || response.data.length === 0) {
+                setHourlyData([]);
+                setCurrentShift(shiftData.shift);
+                return;
+            }
 
-            const calcDiff = (data) =>
-                data.map((val, i) => (i === 0 ? val.cntr_carton : val.cntr_carton - data[i - 1].cntr_carton));
+            const calcDiff = (data: PackingData[]) =>
+                data.map((val: PackingData, i: number) => {
+                    if (i === 0) {
+                        return val.cntr_carton || 0;
+                    }
+                    const prev = data[i - 1]?.cntr_carton || 0;
+                    const curr = val.cntr_carton || 0;
+                    return Math.max(0, curr - prev); // Ensure non-negative
+                });
 
             setHourlyData(calcDiff(response.data));
             setCurrentShift(shiftData.shift);
         } catch (err) {
             console.error(err);
             setError('Gagal memuat data per jam');
+            setHourlyData([]);
+            setCurrentShift(null);
         }
     };
 
-    const getTotalCarton = (line) => {
+    const getTotalCarton = (line: string): number => {
         const currentDay = new Date().getDay(); // 0 = Minggu, 1 = Senin, ..., 6 = Sabtu
 
         if (currentDay === 6) {
@@ -183,10 +221,17 @@ const ComponentCounter2a = ({ line, url, label, nameOpsi = null}) => {
         setLoading(false);
     }, [packingData, shiftData, hourlyData]);
 
-    const getTotalPacked = () => packingData.cntr_carton;
+    const getTotalPacked = () => {
+        const carton = packingData?.cntr_carton || 0;
+        return Number(carton) || 0;
+    };
+    
     const getAchievement = () => {
         const total = getTotalCarton(line); // Memilih total berdasarkan hari
-        return Math.round((getTotalPacked() / total) * 100);
+        if (total <= 0) return 0;
+        const packed = getTotalPacked();
+        const achievement = Math.round((packed / total) * 100);
+        return isNaN(achievement) ? 0 : achievement;
     };
 
 
@@ -220,7 +265,13 @@ const ComponentCounter2a = ({ line, url, label, nameOpsi = null}) => {
                             </button>
                         </div>
                         <div className="text-white text-left font-bigNumbers font-bold p-6 pt-0 mt-auto">
-                            <h3 className="text-3xl flex flex-row items-center"> Shift : {currentShift}  <IconCalendar className='ml-2' />  {currentTime.toLocaleDateString('id-ID')}  <IconClock className='ml-2' /> {currentTime.toLocaleTimeString()}</h3>
+                            <h3 className="text-3xl flex flex-row items-center"> 
+                                Shift : {currentShift !== null ? currentShift : '-'}  
+                                <IconCalendar className='ml-2' />  
+                                {currentTime.toLocaleDateString('id-ID')}  
+                                <IconClock className='ml-2' /> 
+                                {currentTime.toLocaleTimeString()}
+                            </h3>
                         </div>
                     </div>
                     <div className="py-7 px-6">
@@ -228,7 +279,9 @@ const ComponentCounter2a = ({ line, url, label, nameOpsi = null}) => {
                             <div className="w-full h-[500px] shadow-[1px_2px_12px_0_rgba(31,45,61,0.10)] rounded border border-white-light dark:border-[#1b2e4b] flex flex-col items-center mb-2">
                                 <h4 className="text-black text-5xl mt-4 text-center dark:text-white font-black font-extrabold mb-2">ACTUAL</h4>
                                 <div className="flex flex-col items-center justify-center h-full">
-                                    <span className="text-red-600 text-[70px] xl:text-[170px] font-black text-center mt-[100px] font-bigNumbers">{getTotalPacked()}</span>
+                                    <span className="text-red-600 text-[70px] xl:text-[170px] font-black text-center mt-[100px] font-bigNumbers">
+                                        {getTotalPacked().toLocaleString()}
+                                    </span>
                                     <h4 className="text-black text-5xl text-center dark:text-white font-extrabold mt-[150px]">CARTON</h4>
                                 </div>
                             </div>
@@ -248,15 +301,18 @@ const ComponentCounter2a = ({ line, url, label, nameOpsi = null}) => {
                                     <tbody>
                                         {hourlyData.length > 0 ? (
                                             hourlyData.map((carton, idx) => {
+                                                const cartonValue = Number(carton) || 0;
                                                 const maxCarton = getTotalCarton(line);
-                                                const percent = ((carton / maxCarton) * 100).toFixed(1); // Hitung persentase
+                                                const percent = maxCarton > 0 
+                                                    ? ((cartonValue / maxCarton) * 100).toFixed(1) 
+                                                    : '0.0';
                                                 return (
                                                     <tr key={idx}>
                                                         <td className={`border border-red-500 px-2 py-2 text-black font-extrabold w-1/5 ${hourlyData.length > 4 ? 'text-5xl' : 'text-6xl'}`}>
                                                             {idx + 1}
                                                         </td>
                                                         <td className={`border border-red-500 px-2 py-2 text-black font-extrabold w-3/5 ${hourlyData.length > 4 ? 'text-5xl' : 'text-6xl'}`}>
-                                                            {carton}  ({percent}%)
+                                                            {cartonValue.toLocaleString()} ({percent}%)
                                                         </td>
                                                     </tr>
                                                 );
@@ -264,7 +320,7 @@ const ComponentCounter2a = ({ line, url, label, nameOpsi = null}) => {
                                         ) : (
                                             <tr>
                                                 <td className="border border-red-500 px-2 py-2 text-black text-9xl font-extrabold w-1/5">1</td>
-                                                <td className="border border-red-500 px-2 py-2 text-black text-9xl font-extrabold w-3/5">0</td>
+                                                <td className="border border-red-500 px-2 py-2 text-black text-9xl font-extrabold w-3/5">0 (0.0%)</td>
                                             </tr>
                                         )}
                                     </tbody>
@@ -293,13 +349,22 @@ const ComponentCounter2a = ({ line, url, label, nameOpsi = null}) => {
                                         </tr>
                                     </thead>
                                     <tbody className='font-bigNumbers'>
-                                        {Object.entries(shiftData).map(([shift, carton]) => {
+                                        {(['shift1', 'shift2', 'shift3'] as Array<keyof ShiftData>).map((shiftKey) => {
+                                            const carton = shiftData[shiftKey] || 0;
                                             const maxCarton = getTotalCarton(line); // Target per shift
-                                            const percent = ((carton / maxCarton) * 100).toFixed(1); // Hitung persentase
+                                            const percent = maxCarton > 0 
+                                                ? ((Number(carton) / maxCarton) * 100).toFixed(1) 
+                                                : '0.0';
+                                            const shiftNumber = shiftKey.slice(-1);
+                                            
                                             return (
-                                                <tr key={shift}>
-                                                    <td className="border border-red-500 px-2 py-1 text-black text-6xl font-extrabold">{shift.slice(-1)}</td>
-                                                    <td className="border border-red-500 px-2 py-1 text-black text-6xl font-extrabold">{carton} ({percent}%)</td>
+                                                <tr key={shiftKey}>
+                                                    <td className="border border-red-500 px-2 py-1 text-black text-6xl font-extrabold">
+                                                        {shiftNumber}
+                                                    </td>
+                                                    <td className="border border-red-500 px-2 py-1 text-black text-6xl font-extrabold">
+                                                        {Number(carton).toLocaleString()} ({percent}%)
+                                                    </td>
                                                 </tr>
                                             );
                                         })}

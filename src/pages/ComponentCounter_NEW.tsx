@@ -194,10 +194,17 @@ const ComponentCounter: React.FC<ComponentCounterProps> = ({ line, url, label, n
         setLoading(false);
     }, [packingData, shiftData, hourlyData]);
 
-    const getTotalPacked = (): number => packingData.cntr_carton;
+    const getTotalPacked = (): number => {
+        const carton = packingData?.cntr_carton || 0;
+        return Number(carton) || 0;
+    };
+    
     const getAchievement = (): number => {
         const total = getTotalCarton(line);
-        return Math.round((getTotalPacked() / total) * 100);
+        if (total <= 0) return 0;
+        const packed = getTotalPacked();
+        const achievement = Math.round((packed / total) * 100);
+        return isNaN(achievement) ? 0 : achievement;
     };
 
 
@@ -248,7 +255,13 @@ const ComponentCounter: React.FC<ComponentCounterProps> = ({ line, url, label, n
                                 <h1 className="text-white text-4xl md:text-5xl 2xl:text-[50px] font-black font-bigNumbers mt-4" aria-label="Counter">{getTotalCarton(line)} COUNTER</h1>
                             </div>
                             <div className="text-white text-left font-bigNumbers font-bold p-6 pt-0 mt-auto w-full flex flex-col md:flex-row justify-between items-center">
-                                <h3 className="text-2xl md:text-3xl flex flex-row items-center" aria-label="Shift dan Waktu"> Shift : {currentShift}  <IconCalendar className='ml-2' />  {currentTime.toLocaleDateString('id-ID')}  <IconClock className='ml-2' /> {currentTime.toLocaleTimeString()}</h3>
+                                <h3 className="text-2xl md:text-3xl flex flex-row items-center" aria-label="Shift dan Waktu"> 
+                                    Shift : {currentShift !== null ? currentShift : '-'}  
+                                    <IconCalendar className='ml-2' />  
+                                    {currentTime.toLocaleDateString('id-ID')}  
+                                    <IconClock className='ml-2' /> 
+                                    {currentTime.toLocaleTimeString()}
+                                </h3>
                             </div>
                         </header>
                         <section className="py-7 px-6 bg-gradient-to-br from-white via-red-50 to-red-100 border-b border-red-200">
@@ -256,7 +269,9 @@ const ComponentCounter: React.FC<ComponentCounterProps> = ({ line, url, label, n
                                 <div className="w-full  min-h-[16rem] h-auto shadow-md rounded-xl border border-red-200 flex flex-col items-center mb-2 bg-white">
                                     <h4 className="text-red-900 text-3xl md:text-5xl mt-4 text-center font-black font-extrabold mb-2">ACTUAL</h4>
                                     <div className="flex flex-col items-center justify-center h-full p-3">
-                                        <span className="text-red-600 text-[70px] xl:text-[170px] font-black text-center mt-[100px] font-bigNumbers">{getTotalPacked()}</span>
+                                        <span className="text-red-600 text-[70px] xl:text-[170px] font-black text-center mt-[100px] font-bigNumbers">
+                                            {getTotalPacked().toLocaleString()}
+                                        </span>
                                         <h4 className="text-red-900 text-3xl md:text-5xl text-center font-extrabold mt-[150px]">CARTON</h4>
                                     </div>
                                 </div>
@@ -275,8 +290,11 @@ const ComponentCounter: React.FC<ComponentCounterProps> = ({ line, url, label, n
                                         <tbody>
                                             {hourlyData.length > 0 ? (
                                                 hourlyData.map((carton, idx) => {
+                                                    const cartonValue = Number(carton) || 0;
                                                     const maxCarton = getTotalCarton(line);
-                                                    const percent = ((carton / maxCarton) * 100).toFixed(1);
+                                                    const percent = maxCarton > 0 
+                                                        ? ((cartonValue / maxCarton) * 100).toFixed(1) 
+                                                        : '0.0';
                                                     return (
                                                         <tr key={idx} className="hover:bg-red-50 transition">
                                                             <td
@@ -286,7 +304,7 @@ const ComponentCounter: React.FC<ComponentCounterProps> = ({ line, url, label, n
                                                             </td>
                                                             <td className={`border border-red-400 text-red-900 font-extrabold w-3/5 ${hourlyData.length > 4 ? 'text-5xl' : 'text-6xl'}`}>
                                                                 <div className="flex flex-row items-center justify-center">
-                                                                    <h3>{carton}</h3>
+                                                                    <h3>{cartonValue.toLocaleString()}</h3>
                                                                     <h3>({percent}%)</h3>
                                                                 </div>
                                                             </td>
@@ -340,13 +358,22 @@ const ComponentCounter: React.FC<ComponentCounterProps> = ({ line, url, label, n
                                         </tr>
                                     </thead>
                                     <tbody className='font-bigNumbers'>
-                                        {Object.entries(shiftData).map(([shift, carton]) => {
+                                        {(['shift1', 'shift2', 'shift3'] as Array<keyof ShiftData>).map((shiftKey) => {
+                                            const carton = shiftData[shiftKey] || 0;
                                             const maxCarton = getTotalCarton(line);
-                                            const percent = ((carton / maxCarton) * 100).toFixed(1);
+                                            const percent = maxCarton > 0 
+                                                ? ((Number(carton) / maxCarton) * 100).toFixed(1) 
+                                                : '0.0';
+                                            const shiftNumber = shiftKey.slice(-1);
+                                            
                                             return (
-                                                <tr key={shift} className="hover:bg-red-50 transition">
-                                                    <td className="border border-red-400 text-red-900 font-extrabold w-1/5 text-2xl md:text-4xl lg:text-5xl">{shift.slice(-1)}</td>
-                                                    <td className="border border-red-400 text-red-900 font-extrabold w-3/5 text-2xl md:text-4xl lg:text-5xl">{carton} ({percent}%)</td>
+                                                <tr key={shiftKey} className="hover:bg-red-50 transition">
+                                                    <td className="border border-red-400 text-red-900 font-extrabold w-1/5 text-2xl md:text-4xl lg:text-5xl">
+                                                        {shiftNumber}
+                                                    </td>
+                                                    <td className="border border-red-400 text-red-900 font-extrabold w-3/5 text-2xl md:text-4xl lg:text-5xl">
+                                                        {Number(carton).toLocaleString()} ({percent}%)
+                                                    </td>
                                                 </tr>
                                             );
                                         })}

@@ -179,10 +179,17 @@ const ComponentCounter = ({ line, url, label, nameOpsi = null}) => {
         setLoading(false);
     }, [packingData, shiftData, hourlyData]);
 
-    const getTotalPacked = () => packingData.cntr_carton;
+    const getTotalPacked = () => {
+        const carton = packingData?.cntr_carton || 0;
+        return Number(carton) || 0;
+    };
+    
     const getAchievement = () => {
         const total = getTotalCarton(line); // Memilih total berdasarkan hari
-        return Math.round((getTotalPacked() / total) * 100);
+        if (total <= 0) return 0;
+        const packed = getTotalPacked();
+        const achievement = Math.round((packed / total) * 100);
+        return isNaN(achievement) ? 0 : achievement;
     };
 
 
@@ -214,7 +221,13 @@ const ComponentCounter = ({ line, url, label, nameOpsi = null}) => {
                             </button>
                         </div>
                         <div className="text-white text-left font-bigNumbers font-bold p-6 pt-0 mt-auto">
-                            <h3 className="text-3xl flex flex-row items-center"> Shift : {currentShift}  <IconCalendar className='ml-2' />  {currentTime.toLocaleDateString('id-ID')}  <IconClock className='ml-2' /> {currentTime.toLocaleTimeString()}</h3>
+                            <h3 className="text-3xl flex flex-row items-center"> 
+                                Shift : {currentShift !== null ? currentShift : '-'}  
+                                <IconCalendar className='ml-2' />  
+                                {currentTime.toLocaleDateString('id-ID')}  
+                                <IconClock className='ml-2' /> 
+                                {currentTime.toLocaleTimeString()}
+                            </h3>
                         </div>
                     </div>
                     <div className="py-7 px-6">
@@ -222,7 +235,9 @@ const ComponentCounter = ({ line, url, label, nameOpsi = null}) => {
                             <div className="w-full h-[500px] shadow-[1px_2px_12px_0_rgba(31,45,61,0.10)] rounded border border-white-light dark:border-[#1b2e4b] flex flex-col items-center mb-2">
                                 <h4 className="text-black text-5xl mt-4 text-center dark:text-white font-black font-extrabold mb-2">ACTUAL</h4>
                                 <div className="flex flex-col items-center justify-center h-full">
-                                    <span className="text-red-600 text-[70px] xl:text-[170px] font-black text-center mt-[100px] font-bigNumbers">{getTotalPacked()}</span>
+                                    <span className="text-red-600 text-[70px] xl:text-[170px] font-black text-center mt-[100px] font-bigNumbers">
+                                        {getTotalPacked().toLocaleString()}
+                                    </span>
                                     <h4 className="text-black text-5xl text-center dark:text-white font-extrabold mt-[150px]">CARTON</h4>
                                 </div>
                             </div>
@@ -242,15 +257,18 @@ const ComponentCounter = ({ line, url, label, nameOpsi = null}) => {
                                     <tbody>
                                         {hourlyData.length > 0 ? (
                                             hourlyData.map((carton, idx) => {
+                                                const cartonValue = Number(carton) || 0;
                                                 const maxCarton = getTotalCarton(line);
-                                                const percent = ((carton / maxCarton) * 100).toFixed(1); // Hitung persentase
+                                                const percent = maxCarton > 0 
+                                                    ? ((cartonValue / maxCarton) * 100).toFixed(1) 
+                                                    : '0.0';
                                                 return (
                                                     <tr key={idx}>
                                                         <td className={`border border-red-500 px-2 py-2 text-black font-extrabold w-1/5 ${hourlyData.length > 4 ? 'text-5xl' : 'text-6xl'}`}>
                                                             {idx + 1}
                                                         </td>
                                                         <td className={`border border-red-500 px-2 py-2 text-black font-extrabold w-3/5 ${hourlyData.length > 4 ? 'text-5xl' : 'text-6xl'}`}>
-                                                            {carton}  ({percent}%)
+                                                            {cartonValue.toLocaleString()}  ({percent}%)
                                                         </td>
                                                     </tr>
                                                 );
@@ -258,7 +276,7 @@ const ComponentCounter = ({ line, url, label, nameOpsi = null}) => {
                                         ) : (
                                             <tr>
                                                 <td className="border border-red-500 px-2 py-2 text-black text-9xl font-extrabold w-1/5">1</td>
-                                                <td className="border border-red-500 px-2 py-2 text-black text-9xl font-extrabold w-3/5">0</td>
+                                                <td className="border border-red-500 px-2 py-2 text-black text-9xl font-extrabold w-3/5">0 (0.0%)</td>
                                             </tr>
                                         )}
                                     </tbody>
@@ -287,13 +305,22 @@ const ComponentCounter = ({ line, url, label, nameOpsi = null}) => {
                                         </tr>
                                     </thead>
                                     <tbody className='font-bigNumbers'>
-                                        {Object.entries(shiftData).map(([shift, carton]) => {
+                                        {['shift1', 'shift2', 'shift3'].map((shiftKey) => {
+                                            const carton = shiftData[shiftKey] || 0;
                                             const maxCarton = getTotalCarton(line); // Target per shift
-                                            const percent = ((carton / maxCarton) * 100).toFixed(1); // Hitung persentase
+                                            const percent = maxCarton > 0 
+                                                ? ((Number(carton) / maxCarton) * 100).toFixed(1) 
+                                                : '0.0';
+                                            const shiftNumber = shiftKey.slice(-1);
+                                            
                                             return (
-                                                <tr key={shift}>
-                                                    <td className="border border-red-500 px-2 py-1 text-black text-6xl font-extrabold">{shift.slice(-1)}</td>
-                                                    <td className="border border-red-500 px-2 py-1 text-black text-6xl font-extrabold">{carton} ({percent}%)</td>
+                                                <tr key={shiftKey}>
+                                                    <td className="border border-red-500 px-2 py-1 text-black text-6xl font-extrabold">
+                                                        {shiftNumber}
+                                                    </td>
+                                                    <td className="border border-red-500 px-2 py-1 text-black text-6xl font-extrabold">
+                                                        {Number(carton).toLocaleString()} ({percent}%)
+                                                    </td>
                                                 </tr>
                                             );
                                         })}
