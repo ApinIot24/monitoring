@@ -1,0 +1,338 @@
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import IconArrowLeft from '../Icon/IconArrowLeft';
+import IconClock from '../Icon/IconClock';
+import IconCalendar from '../Icon/IconCalendar';
+import mayoraimg from '../../../public/assets/images/logo2.png';
+import { Link } from 'react-router-dom';
+
+interface ComponentCounterProps {
+    line: keyof typeof TOTAL_CARTON;
+    url: string;
+    label: string;
+    nameOpsi?: string | null;
+}
+
+interface PackingData {
+    cntr_carton: number;
+}
+
+interface ShiftData {
+    shift1: number;
+    shift2: number;
+    shift3: number;
+}
+
+const TOTAL_CARTON = {
+    l1: 1016,
+    l2: 1368,
+    l5: 6640,
+    l6: 2432,
+    l7: 2432,
+};
+const TOTAL_CARTON_Sabtu = {
+    l1: 630,
+    l2: 473,
+    l5: 4150,
+    l6: 1330,
+    l7: 1330,
+};
+
+const ComponentCounter: React.FC<ComponentCounterProps> = ({ line, url, label, nameOpsi = null }) => {
+    const [currentTime, setCurrentTime] = useState<Date>(new Date());
+    const [currentShift, setCurrentShift] = useState<number | null>(null);
+    const [packingData, setPackingData] = useState<PackingData>({ cntr_carton: 0 });
+    const [shiftData, setShiftData] = useState<ShiftData>({ shift1: 0, shift2: 0, shift3: 0 });
+    const [hourlyData, setHourlyData] = useState<number[]>([]);
+    const [isLoading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setCurrentTime(new Date());
+        }, 1000);
+        return () => clearInterval(timer);
+    }, []);
+
+    const handleFullScreen = () => {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen();
+        } else {
+            document.exitFullscreen();
+        }
+    };
+
+    const APIURLs = {
+        packing: `http://10.37.12.34:3000/packing_${line}`,
+        shift: `http://10.37.12.34:3000/shift_${line}`,
+        hourly: {
+            shift1: `http://10.37.12.34:3000/shift1_${line}_hourly`,
+            shift2: `http://10.37.12.34:3000/shift2_${line}_hourly`,
+            shift3: `http://10.37.12.34:3000/shift3_${line}_hourly`
+        }
+    };
+
+    const fetchPackingData = async () => {
+        try {
+            const response = await axios.get(APIURLs.packing);
+            setPackingData(response.data[0] || { cntr_carton: 0 });
+        } catch (err) {
+            console.error(err);
+            setError('Gagal memuat data packing');
+        }
+    };
+
+    const fetchShiftData = async () => {
+        try {
+            const response = await axios.get(APIURLs.shift);
+            setShiftData(response.data[0] || { shift1: 0, shift2: 0, shift3: 0 });
+        } catch (err) {
+            console.error(err);
+            setError('Gagal memuat data shift');
+        }
+    };
+
+    const fetchHourlyData = async () => {
+        const getShiftURL = (): { shift: number | null; url: string | null } => {
+            const now = new Date();
+            const hours = now.getHours();
+            const minutes = now.getMinutes();
+            const day = now.getDay();
+
+            let shift: number | null;
+
+            if (day === 6) {
+                if ((hours === 6 && minutes >= 46) || ((hours > 6 && hours < 11) || (hours === 11 && minutes <= 45))) {
+                    shift = 1;
+                    return { shift, url: APIURLs.hourly.shift1 };
+                } else if ((hours === 11 && minutes >= 46) || ((hours > 11 && hours < 16) || (hours === 16 && minutes <= 45))) {
+                    shift = 2;
+                    return { shift, url: APIURLs.hourly.shift2 };
+                } else {
+                    shift = 3;
+                    return { shift, url: APIURLs.hourly.shift3 };
+                }
+            } else {
+                if ((hours === 6 && minutes >= 46) || ((hours > 6 && hours < 14) || (hours === 14 && minutes <= 45))) {
+                    shift = 1;
+                    return { shift, url: APIURLs.hourly.shift1 };
+                } else if ((hours === 14 && minutes >= 46) || ((hours > 14 && hours < 22) || (hours === 22 && minutes <= 45))) {
+                    shift = 2;
+                    return { shift, url: APIURLs.hourly.shift2 };
+                } else {
+                    shift = 3;
+                    return { shift, url: APIURLs.hourly.shift3 };
+                }
+            }
+
+            shift = null;
+            return { shift, url: null };
+        };
+
+        try {
+            const shiftData = getShiftURL();
+            if (!shiftData.url) {
+                setHourlyData([]);
+                setCurrentShift(shiftData.shift);
+                return;
+            }
+            const response = await axios.get(shiftData.url);
+
+            const calcDiff = (data: { cntr_carton: number }[]) =>
+                data.map((val, i) => (i === 0 ? val.cntr_carton : val.cntr_carton - data[i - 1].cntr_carton));
+
+            setHourlyData(calcDiff(response.data));
+            setCurrentShift(shiftData.shift);
+        } catch (err) {
+            console.error(err);
+            setError('Gagal memuat data per jam');
+        }
+    };
+
+    const getTotalCarton = (line: keyof typeof TOTAL_CARTON) => {
+        const currentDay = new Date().getDay();
+
+        if (currentDay === 6) {
+            return TOTAL_CARTON_Sabtu[line] || 1000;
+        }
+
+        return TOTAL_CARTON[line] || 1000;
+    };
+
+    useEffect(() => {
+        setLoading(true);
+
+        fetchPackingData();
+        fetchShiftData();
+        fetchHourlyData();
+
+        const interval = setInterval(() => {
+            fetchPackingData();
+            fetchShiftData();
+            fetchHourlyData();
+        }, 3000);
+
+        return () => clearInterval(interval);
+    }, [line]);
+
+    useEffect(() => {
+        setLoading(false);
+    }, [packingData, shiftData, hourlyData]);
+
+    const getTotalPacked = () => {
+        const carton = packingData?.cntr_carton || 0;
+        return Number(carton) || 0;
+    };
+    
+    const getAchievement = () => {
+        const total = getTotalCarton(line);
+        if (total <= 0) return 0;
+        const packed = getTotalPacked();
+        const achievement = Math.round((packed / total) * 100);
+        return isNaN(achievement) ? 0 : achievement;
+    };
+
+
+
+    return (
+        <div>
+            <div className="mb-5 flex items-center justify-center flex-wrap xl:flex-nowrap">
+                <div className="w-full bg-white shadow-[4px_6px_10px_-3px_#bfc9d4] rounded border border-white-light dark:border-[#1b2e4b] dark:bg-[#191e3a] dark:shadow-none">
+                    <div className="p-5 bg-red-600 flex flex-col items-center">
+                        <div className='flex w-[100%]'>
+                            <Link to="/" className="items-center">
+                                <h1 className="text-white text-lg 2xl:text-[15px] font-black dark:text-white-light pr-3">WFR</h1>
+                            </Link>
+                            <Link to="/biscuit" className="items-center">
+                                <h1 className="text-white text-lg 2xl:text-[15px] font-black dark:text-white-light pr-3">BSC</h1>
+                            </Link>
+                            <Link to="/tcw" className="items-center">
+                                <h1 className="text-white text-lg 2xl:text-[15px] font-black dark:text-white-light">TCW</h1>
+                            </Link>
+                        </div>
+                        <div className="flex flex-row items-center">
+                            <h1 className="text-white text-5xl 2xl:text-[50px] font-black font-bigNumbers mt-4">  {(nameOpsi != null ? nameOpsi : label)} LINE {line.slice(-1)}</h1>
+                            <Link to={url} className="flex items-center mt-4">
+                                <IconArrowLeft className="h-[100px] w-[100px] text-white" />
+                            </Link>
+                            <h1 className="text-white text-5xl 2xl:text-[50px] font-black font-bigNumbers mt-4">{getTotalCarton(line)} CARTON</h1>
+                            <button onClick={handleFullScreen} className="mt-4 items-center rounded-lg p-2">
+                                <img src={mayoraimg} alt="" className="h-[50px] md:h-[70px] lg:h-[100px]" />
+                            </button>
+                        </div>
+                        <div className="text-white text-left font-bigNumbers font-bold p-6 pt-0 mt-auto">
+                            <h3 className="text-3xl flex flex-row items-center"> 
+                                Shift : {currentShift !== null ? currentShift : '-'}  
+                                <IconCalendar className='ml-2' />  
+                                {currentTime.toLocaleDateString('id-ID')}  
+                                <IconClock className='ml-2' /> 
+                                {currentTime.toLocaleTimeString()}
+                            </h3>
+                        </div>
+                    </div>
+                    <div className="py-7 px-6">
+                        <div className="flex flex-row items-center mb-2">
+                            <div className="w-full h-[500px] shadow-[1px_2px_12px_0_rgba(31,45,61,0.10)] rounded border border-white-light dark:border-[#1b2e4b] flex flex-col items-center mb-2">
+                                <h4 className="text-black text-5xl mt-4 text-center dark:text-white font-black font-extrabold mb-2">ACTUAL</h4>
+                                <div className="flex flex-col items-center justify-center h-full">
+                                    <span className="text-red-600 text-[70px] xl:text-[170px] font-black text-center mt-[100px] font-bigNumbers">
+                                        {getTotalPacked().toLocaleString()}
+                                    </span>
+                                    <h4 className="text-black text-5xl text-center dark:text-white font-extrabold mt-[150px]">CARTON</h4>
+                                </div>
+                            </div>
+
+                            <div className="w-full h-[500px] shadow-[1px_2px_12px_0_rgba(31,45,61,0.10)] rounded border border-white-light dark:border-[#1b2e4b] flex justify-center">
+                                <table className="w-full text-center border-collapse font-bigNumbers">
+                                    <thead>
+                                        <tr>
+                                            <th className="border border-red-500 px-4 py-2">
+                                                <h4 className="text-white text-2xl font-extrabold">JAM</h4>
+                                            </th>
+                                            <th className="border border-red-500 px-4 py-2">
+                                                <h4 className="text-white text-2xl font-extrabold">CARTON</h4>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {hourlyData.length > 0 ? (
+                                            hourlyData.map((carton, idx) => {
+                                                const cartonValue = Number(carton) || 0;
+                                                const maxCarton = getTotalCarton(line);
+                                                const percent = maxCarton > 0 
+                                                    ? ((cartonValue / maxCarton) * 100).toFixed(1) 
+                                                    : '0.0';
+                                                return (
+                                                    <tr key={idx}>
+                                                        <td className={`border border-red-500 px-2 py-2 text-black font-extrabold w-1/5 ${hourlyData.length > 4 ? 'text-5xl' : 'text-6xl'}`}>
+                                                            {idx + 1}
+                                                        </td>
+                                                        <td className={`border border-red-500 px-2 py-2 text-black font-extrabold w-3/5 ${hourlyData.length > 4 ? 'text-5xl' : 'text-6xl'}`}>
+                                                            {cartonValue.toLocaleString()}  ({percent}%)
+                                                        </td>
+                                                    </tr>
+                                                );
+                                            })
+                                        ) : (
+                                            <tr>
+                                                <td className="border border-red-500 px-2 py-2 text-black text-9xl font-extrabold w-1/5">1</td>
+                                                <td className="border border-red-500 px-2 py-2 text-black text-9xl font-extrabold w-3/5">0 (0.0%)</td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div className="flex flex-col md:flex-row items-center mb-2">
+                            <div className="w-full md:w-full h-[300px] shadow-[1px_2px_12px_0_rgba(31,45,61,0.10)] rounded border border-white-light dark:border-[#1b2e4b] flex flex-col justify-center mb-2 md:mb-0">
+                                <h4 className="text-black text-5xl mt-4 text-center dark:text-white font-black font-extrabold mb-2">Achievement</h4>
+                                <div className="flex flex-col items-center justify-center h-full">
+                                    <span className="text-red-600 text-[70px] xl:text-[130px] font-black text-center font-bigNumbers">{getAchievement()}%</span>
+                                </div>
+                            </div>
+
+                            <div className="w-full md:w-full h-[300px] shadow-[1px_2px_12px_0_rgba(31,45,61,0.10)] rounded border border-white-light dark:border-[#1b2e4b] flex justify-center">
+                                <table className="w-full text-center border-collapse">
+                                    <thead>
+                                        <tr>
+                                            <th className="border border-red-500 px-4 py-2">
+                                                <h4 className="text-white text-4xl dark:text-white font-extrabold">SHIFT</h4>
+                                            </th>
+                                            <th className="border border-red-500 px-4 py-2">
+                                                <h4 className="text-white text-4xl dark:text-white font-extrabold">CARTON</h4>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className='font-bigNumbers'>
+                                        {(['shift1', 'shift2', 'shift3'] as const).map((shiftKey) => {
+                                            const carton = shiftData[shiftKey] || 0;
+                                            const maxCarton = getTotalCarton(line);
+                                            const percent = maxCarton > 0 
+                                                ? ((Number(carton) / maxCarton) * 100).toFixed(1) 
+                                                : '0.0';
+                                            const shiftNumber = shiftKey.slice(-1);
+                                            
+                                            return (
+                                                <tr key={shiftKey}>
+                                                    <td className="border border-red-500 px-2 py-1 text-black text-6xl font-extrabold">
+                                                        {shiftNumber}
+                                                    </td>
+                                                    <td className="border border-red-500 px-2 py-1 text-black text-6xl font-extrabold">
+                                                        {Number(carton).toLocaleString()} ({percent}%)
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default ComponentCounter;

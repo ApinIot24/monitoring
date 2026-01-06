@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import ComponentCounter from "./ComponentCounter_NEW";
+import ComponentCounter from "../components/Counter/ComponentCounter_NEW";
 
 const Index = () => {
-    const lines = ["l1", "l2"]; // Sesuaikan dengan line yang ingin ditampilkan
+    const lines = ["l1", "l2"] as const;
     const videos = ["/videos/R2_fixed.mp4"]; // Ganti sesuai lokasi videomu
     const [showVideo, setShowVideo] = useState(false);
     const [isAutoplay, setIsAutoplay] = useState(false);

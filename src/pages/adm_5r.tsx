@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import ComponentCounter_carton from "./ComponentCounter_NEW";
-import ComponentCounter from "./ComponentCounter_Tilting";
+import ComponentCounter_carton from "../components/Counter/ComponentCounter_NEW";
+import ComponentCounter from "../components/Counter/ComponentCounter_Tilting";
 
 const c_adm_bsc = () => {
-    const line = "l5";
+    const line = "l5" as const;
     const videos = ["/videos/R2_fixed.mp4"]; // Tambahkan path video kamu
     const [showVideo, setShowVideo] = useState(false);
     const [isAutoplay, setIsAutoplay] = useState(false);

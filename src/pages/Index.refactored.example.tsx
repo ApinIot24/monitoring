@@ -6,13 +6,13 @@
  */
 
 import React from 'react';
-import ComponentCounter from './ComponentCounter_NEW';
+import ComponentCounter from '../components/Counter/ComponentCounter_NEW';
 import { useVideoAutoplay } from '../hooks/useVideoAutoplay';
 import { VideoPlayer, VideoControls } from '../components/VideoPlayer';
 import { VIDEO_PATHS } from '../constants/video';
 
 const Index = () => {
-    const lines = ['l1', 'l2'];
+    const lines = ['l1', 'l2'] as const;
     const videos = [VIDEO_PATHS.default];
 
     // Use custom hook for video autoplay

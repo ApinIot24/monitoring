@@ -6,13 +6,13 @@
  */
 
 import React from 'react';
-import ComponentCounter from './ComponentCounter_NEW';
+import ComponentCounter from '../components/Counter/ComponentCounter_NEW';
 import { useVideoAutoplay } from '../hooks/useVideoAutoplay';
 import { VideoPlayer, VideoControls } from '../components/VideoPlayer';
 import { VIDEO_PATHS } from '../constants/video';
 
 const Biscuit = () => {
-    const lines = ['l5'];
+    const lines = ['l5'] as const;
     const videos = [VIDEO_PATHS.default];
 
     // Use custom hook for video autoplay with 2-hour interval

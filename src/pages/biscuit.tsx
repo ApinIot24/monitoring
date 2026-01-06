@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
-import ComponentCounter from "./ComponentCounter_NEW";
+import ComponentCounter from "../components/Counter/ComponentCounter_NEW";
 
 const Biscuit = () => {
-  const lines = ["l5"];
+  const lines = ["l5"] as const;
   const videos = ["/videos/R2_fixed.mp4"];
   const [showVideo, setShowVideo] = useState(false);
   const [isAutoplay, setIsAutoplay] = useState(true); // aktifkan autoplay

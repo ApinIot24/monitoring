@@ -1,14 +1,14 @@
 import React from 'react';
-import ComponentCounter from './ComponentCounter2a';
+import ComponentCounter from '../components/Counter/ComponentCounter2a';
 
 const mks_l2a = () => {
-    const lines = ['l2at','l2ar']; // Sesuaikan dengan line yang ingin ditampilkan
+    const lines = ['renceng_l2a','tray_l2a']; // Sesuaikan dengan line yang ingin ditampilkan
 
     return (
         <div className="mb-5 flex items-center justify-center flex-wrap xl:flex-nowrap">
             {lines.map(line => (
                 <div key={line} className="lg:max-w-[100%] w-full bg-white shadow-[4px_6px_10px_-3px_#bfc9d4] rounded border border-white-light dark:border-[#1b2e4b] dark:bg-[#191e3a] dark:shadow-none">
-                    <ComponentCounter line={line} url={'/mks_l2a'} label={'BSC'}/>
+                    <ComponentCounter line={line} url={'/malcok_2b'} label={'BSC'}/>
                 </div>
             ))}
         </div>

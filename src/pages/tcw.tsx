@@ -1,8 +1,8 @@
 import React from 'react';
-import ComponentCounter from './ComponentCounter_NEW';
+import ComponentCounter from '../components/Counter/ComponentCounter_NEW';
 
 const tcw = () => {
-    const lines = ['l7', 'l6']; // Sesuaikan dengan line yang ingin ditampilkan
+    const lines = ['l7', 'l6'] as const;
 
     return (
         <div className="flex items-center justify-center flex-wrap xl:flex-nowrap">

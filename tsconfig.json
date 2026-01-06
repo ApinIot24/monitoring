@@ -17,5 +17,13 @@
         "jsx": "react-jsx"
     },
     "include": ["src"],
+    "exclude": [
+        "src/pages/Index_2.tsx",
+        "src/pages/Index_3.tsx",
+        "src/pages/ComponentCounter.tsx",
+        "src/pages/ComponentCounterMalcok2b.tsx",
+        "src/pages/Index.refactored.example.tsx",
+        "src/pages/biscuit.refactored.example.tsx"
+    ],
     "references": [{ "path": "./tsconfig.node.json" }]
 }

@@ -6,18 +6,22 @@ import mayoraimg from '../../public/assets/images/logo2.png';
 import dayjs from 'dayjs';
 import { date } from 'yup';
 
+type PackingItem = { cntr_carton: number };
+type ShiftTotals = { shift1: number; shift2: number; shift3: number };
+
 const Index_2 = () => {
-    const [packing_l1, setData] = useState([]);
-    const [packing_l2, setData1] = useState([]);
+    const [packing_l1, setData] = useState<PackingItem[]>([]);
+    const [packing_l2, setData1] = useState<PackingItem[]>([]);
 
-    const [JamPackingl1_shift, setJamPackingl1_shift] = useState([]);
-    const [JamPackingl2_shift, setJamPackingl2_shift] = useState([]);
+    const [JamPackingl1_shift, setJamPackingl1_shift] = useState<number[]>([]);
+    const [JamPackingl2_shift, setJamPackingl2_shift] = useState<number[]>([]);
 
-    const [ShiftPackingl1, setShiftPackingl1] = useState({});
-    const [ShiftPackingl2, setShiftPackingl2] = useState({});
+    const [ShiftPackingl1, setShiftPackingl1] = useState<ShiftTotals>({ shift1: 0, shift2: 0, shift3: 0 });
+    const [ShiftPackingl2, setShiftPackingl2] = useState<ShiftTotals>({ shift1: 0, shift2: 0, shift3: 0 });
 
-    const [isLoading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const [isLoading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
+    const [fullscrean, setfullscrean] = useState<boolean>(false);
 
     const handlefullscrean = () => {
         if (!document.fullscreenElement) {
