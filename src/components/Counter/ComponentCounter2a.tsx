@@ -57,23 +57,33 @@ const ComponentCounter2a = ({ line, url, label, nameOpsi = null }: ComponentCoun
         }
     };
 
-    const TOTAL_CARTON: Record<string, number> = {
-        l1: 1120,
-        l2: 1512,
-        l2at: 3251,
-        l2ar: 6096,
-        l5: 6640,
-        l6: 2432,
-        l7: 2432,
+    const SHIFT_TARGETS_WEEKDAY: Record<string, ShiftData> = {
+        renceng_l2a: { shift1: 2163, shift2: 2163, shift3: 1514 },
+        tray_l2a: { shift1: 6000, shift2: 6000, shift3: 4200 },
     };
-    const TOTAL_CARTON_Sabtu: Record<string, number> = {
-        l1: 630,
-        l2: 473,
-        l2at: 3251,
-        l2ar: 6096,
-        l5: 4150,
-        l6: 1330,
-        l7: 1330,
+    const SHIFT_TARGETS_SATURDAY: Record<string, ShiftData> = {
+        renceng_l2a: { shift1: 935, shift2: 935, shift3: 655 },
+        tray_l2a: { shift1: 4375, shift2: 4375, shift3: 3063 },
+    };
+    const isSaturday = () => new Date().getDay() === 6;
+    const getShiftTargetsForLine = (lineKey: string): ShiftData => {
+        const source = isSaturday() ? SHIFT_TARGETS_SATURDAY : SHIFT_TARGETS_WEEKDAY;
+        return source[lineKey] || { shift1: 0, shift2: 0, shift3: 0 };
+    };
+    const getShiftTarget = (lineKey: string, shift: number | null): number => {
+        const targets = getShiftTargetsForLine(lineKey);
+        if (shift === 1) return targets.shift1;
+        if (shift === 2) return targets.shift2;
+        if (shift === 3) return targets.shift3;
+        return 0;
+    };
+    const getShiftTargetByKey = (lineKey: string, shiftKey: keyof ShiftData): number => {
+        const targets = getShiftTargetsForLine(lineKey);
+        return targets[shiftKey] || 0;
+    };
+    const getDailyTarget = (lineKey: string): number => {
+        const t = getShiftTargetsForLine(lineKey);
+        return (t.shift1 + t.shift2 + t.shift3);
     };
 
     const fetchPackingData = async () => {
@@ -170,11 +180,7 @@ const ComponentCounter2a = ({ line, url, label, nameOpsi = null }: ComponentCoun
     };
 
     const getTotalCarton = (line: string): number => {
-        const currentDay = new Date().getDay();
-        if (currentDay === 6) {
-            return TOTAL_CARTON_Sabtu[line] || 1000;
-        }
-        return TOTAL_CARTON[line] || 1000;
+        return getDailyTarget(line) || 1000;
     };
 
     useEffect(() => {
@@ -227,11 +233,11 @@ const ComponentCounter2a = ({ line, url, label, nameOpsi = null }: ComponentCoun
                             </Link>
                         </div>
                         <div className="flex flex-row items-center">
-                            <h1 className="text-white text-5xl 2xl:text-[50px] font-black font-bigNumbers mt-4">  {(nameOpsi != null ? nameOpsi : label)} LINE {line.slice(-2)}</h1>
+                            <h1 className="text-white text-5xl 2xl:text-[50px] font-black font-bigNumbers mt-4">  {line.includes('renceng') ? 'Renceng' : line.includes('tray') ? 'Tray' : (nameOpsi != null ? nameOpsi : label)} LINE {line.slice(-2)}</h1>
                             <Link to={url} className="flex items-center mt-4">
                                 <IconArrowLeft className="h-[100px] w-[100px] text-white" />
                             </Link>
-                            <h1 className="text-white text-5xl 2xl:text-[50px] font-black font-bigNumbers mt-4">{getTotalCarton(line)} CARTON</h1>
+                            <h1 className="text-white text-5xl 2xl:text-[50px] font-black font-bigNumbers mt-4">{(currentShift ? getShiftTarget(line, currentShift) : getTotalCarton(line))} CARTON</h1>
                             <button onClick={handleFullScreen} className="mt-4 items-center rounded-lg p-2">
                                 <img src={mayoraimg} alt="" className="h-[50px] md:h-[70px] lg:h-[100px]" />
                             </button>
@@ -274,7 +280,7 @@ const ComponentCounter2a = ({ line, url, label, nameOpsi = null }: ComponentCoun
                                         {hourlyData.length > 0 ? (
                                             hourlyData.map((carton, idx) => {
                                                 const cartonValue = Number(carton) || 0;
-                                                const maxCarton = getTotalCarton(line);
+                                                const maxCarton = getShiftTarget(line, currentShift);
                                                 const percent = maxCarton > 0 
                                                     ? ((cartonValue / maxCarton) * 100).toFixed(1) 
                                                     : '0.0';
@@ -323,7 +329,7 @@ const ComponentCounter2a = ({ line, url, label, nameOpsi = null }: ComponentCoun
                                     <tbody className='font-bigNumbers'>
                                         {(['shift1', 'shift2', 'shift3'] as Array<keyof ShiftData>).map((shiftKey) => {
                                             const carton = shiftData[shiftKey] || 0;
-                                            const maxCarton = getTotalCarton(line);
+                                            const maxCarton = getShiftTargetByKey(line, shiftKey);
                                             const percent = maxCarton > 0 
                                                 ? ((Number(carton) / maxCarton) * 100).toFixed(1) 
                                                 : '0.0';
