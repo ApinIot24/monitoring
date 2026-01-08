@@ -58,12 +58,12 @@ const ComponentCounter2a = ({ line, url, label, nameOpsi = null }: ComponentCoun
     };
 
     const SHIFT_TARGETS_WEEKDAY: Record<string, ShiftData> = {
-        renceng_l2a: { shift1: 2163, shift2: 2163, shift3: 1514 },
-        tray_l2a: { shift1: 6000, shift2: 6000, shift3: 4200 },
+        renceng_l2a: { shift1: 6000, shift2: 6000, shift3: 4200 },
+        tray_l2a: { shift1: 2163, shift2: 2163, shift3: 1514 },
     };
     const SHIFT_TARGETS_SATURDAY: Record<string, ShiftData> = {
-        renceng_l2a: { shift1: 935, shift2: 935, shift3: 655 },
-        tray_l2a: { shift1: 4375, shift2: 4375, shift3: 3063 },
+        renceng_l2a: { shift1: 4375, shift2: 4375, shift3: 3063 },
+        tray_l2a: { shift1: 935, shift2: 935, shift3: 655 },
     };
     const isSaturday = () => new Date().getDay() === 6;
     const getShiftTargetsForLine = (lineKey: string): ShiftData => {
