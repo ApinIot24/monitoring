@@ -150,9 +150,9 @@ const ComponentCounter2a = ({ line, url, label, nameOpsi = null }: ComponentCoun
                 setCurrentShift(null);
                 return;
             }
-            
+
             const response = await axios.get(shiftData.url);
-            
+
             if (!response.data || !Array.isArray(response.data) || response.data.length === 0) {
                 setHourlyData([]);
                 setCurrentShift(shiftData.shift);
@@ -207,7 +207,7 @@ const ComponentCounter2a = ({ line, url, label, nameOpsi = null }: ComponentCoun
         const carton = packingData?.cntr_carton || 0;
         return Number(carton) || 0;
     };
-    
+
     const getAchievement = () => {
         const total = getTotalCarton(line);
         if (total <= 0) return 0;
@@ -233,7 +233,7 @@ const ComponentCounter2a = ({ line, url, label, nameOpsi = null }: ComponentCoun
                             </Link>
                         </div>
                         <div className="flex flex-row items-center">
-                            <h1 className="text-white text-5xl 2xl:text-[50px] font-black font-bigNumbers mt-4">  {line.includes('renceng') ? 'Renceng' : line.includes('tray') ? 'Tray' : (nameOpsi != null ? nameOpsi : label)} LINE {line.slice(-2)}</h1>
+                            <h1 className="text-white text-5xl 2xl:text-[50px] font-black font-bigNumbers mt-4">  {line.includes('renceng') ? 'RENCENG' : line.includes('tray') ? 'TRAY' : (nameOpsi != null ? nameOpsi : label)} {line.slice(-2)}</h1>
                             <Link to={url} className="flex items-center mt-4">
                                 <IconArrowLeft className="h-[100px] w-[100px] text-white" />
                             </Link>
@@ -243,11 +243,11 @@ const ComponentCounter2a = ({ line, url, label, nameOpsi = null }: ComponentCoun
                             </button>
                         </div>
                         <div className="text-white text-left font-bigNumbers font-bold p-6 pt-0 mt-auto">
-                            <h3 className="text-3xl flex flex-row items-center"> 
-                                Shift : {currentShift !== null ? currentShift : '-'}  
-                                <IconCalendar className='ml-2' />  
-                                {currentTime.toLocaleDateString('id-ID')}  
-                                <IconClock className='ml-2' /> 
+                            <h3 className="text-3xl flex flex-row items-center">
+                                Shift : {currentShift !== null ? currentShift : '-'}
+                                <IconCalendar className='ml-2' />
+                                {currentTime.toLocaleDateString('id-ID')}
+                                <IconClock className='ml-2' />
                                 {currentTime.toLocaleTimeString()}
                             </h3>
                         </div>
@@ -281,8 +281,8 @@ const ComponentCounter2a = ({ line, url, label, nameOpsi = null }: ComponentCoun
                                             hourlyData.map((carton, idx) => {
                                                 const cartonValue = Number(carton) || 0;
                                                 const maxCarton = getShiftTarget(line, currentShift);
-                                                const percent = maxCarton > 0 
-                                                    ? ((cartonValue / maxCarton) * 100).toFixed(1) 
+                                                const percent = maxCarton > 0
+                                                    ? ((cartonValue / maxCarton) * 100).toFixed(1)
                                                     : '0.0';
                                                 return (
                                                     <tr key={idx}>
@@ -330,11 +330,11 @@ const ComponentCounter2a = ({ line, url, label, nameOpsi = null }: ComponentCoun
                                         {(['shift1', 'shift2', 'shift3'] as Array<keyof ShiftData>).map((shiftKey) => {
                                             const carton = shiftData[shiftKey] || 0;
                                             const maxCarton = getShiftTargetByKey(line, shiftKey);
-                                            const percent = maxCarton > 0 
-                                                ? ((Number(carton) / maxCarton) * 100).toFixed(1) 
+                                            const percent = maxCarton > 0
+                                                ? ((Number(carton) / maxCarton) * 100).toFixed(1)
                                                 : '0.0';
                                             const shiftNumber = shiftKey.slice(-1);
-                                            
+
                                             return (
                                                 <tr key={shiftKey}>
                                                     <td className="border border-red-500 px-2 py-1 text-black text-6xl font-extrabold">

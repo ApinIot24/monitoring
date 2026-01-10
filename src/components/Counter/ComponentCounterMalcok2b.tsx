@@ -44,9 +44,9 @@ const ComponentCounterMalcok2b: React.FC<ComponentCounterProps> = ({ line, url, 
 
     const headerTitle =
         line === "renceng_l2b"
-            ? "Renceng"
+            ? "RENCENG 2b"
             : line === "tray_l2b"
-                ? "Tray"
+                ? "TRAY 2b"
                 : label;
 
     const [type] = line.split("_");
