@@ -24,13 +24,21 @@ interface ShiftData {
 }
 
 const ComponentCounter2a = ({ line, url, label, nameOpsi = null }: ComponentCounter2aProps) => {
-    const [currentTime, setCurrentTime] = useState(new Date());
+    const [currentTime, setCurrentTime] = useState<Date>(new Date());
     const [currentShift, setCurrentShift] = useState<number | null>(null);
     const [packingData, setPackingData] = useState<PackingData>({ cntr_carton: 0 });
     const [shiftData, setShiftData] = useState<ShiftData>({ shift1: 0, shift2: 0, shift3: 0 });
     const [hourlyData, setHourlyData] = useState<number[]>([]);
-    const [isLoading, setLoading] = useState(true);
+    const [isLoading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
+    const [retry, setRetry] = useState(0);
+
+    const headerTitle =
+        line.includes('renceng')
+            ? `RENCENG ${line.slice(-2).toUpperCase()}`
+            : line.includes('tray')
+                ? `TRAY ${line.slice(-2).toUpperCase()}`
+                : (nameOpsi != null ? nameOpsi : label);
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -184,31 +192,40 @@ const ComponentCounter2a = ({ line, url, label, nameOpsi = null }: ComponentCoun
     };
 
     useEffect(() => {
-        setLoading(true);
+        let mounted = true;
 
-        fetchPackingData();
-        fetchShiftData();
-        fetchHourlyData();
+        const load = async () => {
+            try {
+                await Promise.all([
+                    fetchPackingData(),
+                    fetchShiftData(),
+                    fetchHourlyData()
+                ]);
+                if (mounted) setError(null);
+            } catch (err) {
+                if (mounted) setError("Gagal memuat data");
+            }
+        };
 
-        const interval = setInterval(() => {
-            fetchPackingData();
-            fetchShiftData();
-            fetchHourlyData();
-        }, 3000);
+        load();
+        const timer = setInterval(load, 10000);
 
-        return () => clearInterval(interval);
-    }, [line]);
+        return () => {
+            mounted = false;
+            clearInterval(timer);
+        };
+    }, [line, retry]);
 
     useEffect(() => {
-        setLoading(false);
+        if (packingData && shiftData && hourlyData) setLoading(false);
     }, [packingData, shiftData, hourlyData]);
 
-    const getTotalPacked = () => {
+    const getTotalPacked = (): number => {
         const carton = packingData?.cntr_carton || 0;
         return Number(carton) || 0;
     };
 
-    const getAchievement = () => {
+    const getAchievement = (): number => {
         const total = getTotalCarton(line);
         if (total <= 0) return 0;
         const packed = getTotalPacked();
@@ -216,113 +233,136 @@ const ComponentCounter2a = ({ line, url, label, nameOpsi = null }: ComponentCoun
         return isNaN(achievement) ? 0 : achievement;
     };
 
+    const ErrorDisplay = ({ message, onRetry }: { message: string, onRetry: () => void }) => (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
+            <strong>Error:</strong> {message}
+            <button
+                onClick={onRetry}
+                className="block bg-red-500 text-white px-4 py-2 rounded mt-2"
+            >
+                Retry
+            </button>
+        </div>
+    );
+
     return (
-        <div>
-            <div className="mb-5 flex items-center justify-center flex-wrap xl:flex-nowrap">
-                <div className="w-full bg-white shadow-[4px_6px_10px_-3px_#bfc9d4] rounded border border-white-light dark:border-[#1b2e4b] dark:bg-[#191e3a] dark:shadow-none">
-                    <div className="p-5 bg-red-600 flex flex-col items-center">
-                        <div className='flex w-[100%]'>
-                            <Link to="/" className="items-center">
-                                <h1 className="text-white text-lg 2xl:text-[15px] font-black dark:text-white-light pr-3">WFR</h1>
-                            </Link>
-                            <Link to="/biscuit" className="items-center">
-                                <h1 className="text-white text-lg 2xl:text-[15px] font-black dark:text-white-light pr-3">BSC</h1>
-                            </Link>
-                            <Link to="/tcw" className="items-center">
-                                <h1 className="text-white text-lg 2xl:text-[15px] font-black dark:text-white-light">TCW</h1>
-                            </Link>
-                        </div>
-                        <div className="flex flex-row items-center">
-                            <h1 className="text-white text-5xl 2xl:text-[50px] font-black font-bigNumbers mt-4">  {line.includes('renceng') ? 'RENCENG' : line.includes('tray') ? 'TRAY' : (nameOpsi != null ? nameOpsi : label)} {line.slice(-2)}</h1>
-                            <Link to={url} className="flex items-center mt-4">
-                                <IconArrowLeft className="h-[100px] w-[100px] text-white" />
-                            </Link>
-                            <h1 className="text-white text-5xl 2xl:text-[50px] font-black font-bigNumbers mt-4">{(currentShift ? getShiftTarget(line, currentShift) : getTotalCarton(line))} CARTON</h1>
-                            <button onClick={handleFullScreen} className="mt-4 items-center rounded-lg p-2">
-                                <img src={mayoraimg} alt="" className="h-[50px] md:h-[70px] lg:h-[100px]" />
-                            </button>
-                        </div>
-                        <div className="text-white text-left font-bigNumbers font-bold p-6 pt-0 mt-auto">
-                            <h3 className="text-3xl flex flex-row items-center">
-                                Shift : {currentShift !== null ? currentShift : '-'}
-                                <IconCalendar className='ml-2' />
-                                {currentTime.toLocaleDateString('id-ID')}
-                                <IconClock className='ml-2' />
-                                {currentTime.toLocaleTimeString()}
-                            </h3>
-                        </div>
-                    </div>
-                    <div className="py-7 px-6">
-                        <div className="flex flex-row items-center mb-2">
-                            <div className="w-full h-[500px] shadow-[1px_2px_12px_0_rgba(31,45,61,0.10)] rounded border border-white-light dark:border-[#1b2e4b] flex flex-col items-center mb-2">
-                                <h4 className="text-black text-5xl mt-4 text-center dark:text-white font-black font-extrabold mb-2">ACTUAL</h4>
-                                <div className="flex flex-col items-center justify-center h-full">
-                                    <span className="text-red-600 text-[70px] xl:text-[170px] font-black text-center mt-[100px] font-bigNumbers">
-                                        {getTotalPacked().toLocaleString()}
-                                    </span>
-                                    <h4 className="text-black text-5xl text-center dark:text-white font-extrabold mt-[150px]">CARTON</h4>
+        <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-red-100 animate-fade-in">
+            {isLoading && (
+                <div className="flex justify-center items-center h-screen">
+                    <div className="text-3xl text-red-600 font-bold animate-fade-in">Loading...</div>
+                </div>
+            )}
+            {error && (
+                <div className="flex justify-center items-center h-screen">
+                    <ErrorDisplay message={error} onRetry={() => { setError(null); setRetry(retry + 1); }} />
+                </div>
+            )}
+            {!isLoading && !error && (
+                <main className="flex flex-col items-center justify-center flex-wrap xl:flex-nowrap animate-fade-in">
+                    <div className="w-full max-w-6xl bg-white shadow-lg rounded-xl border border-red-200 dark:border-[#1b2e4b] dark:bg-[#191e3a] dark:shadow-none overflow-hidden">
+                        <header className="p-2 bg-gradient-to-r from-red-600 via-red-500 to-red-400 flex flex-col items-center shadow-md">
+                            <div className="flex flex-col md:flex-row items-center w-full justify-between">
+                                <h1 className="text-white text-4xl md:text-5xl 2xl:text-[50px] font-black font-bigNumbers mt-4" aria-label="Judul">{headerTitle}</h1>
+                                <div className="flex items-center gap-4 mt-4 md:mt-0">
+                                    <Link to={url} className="flex items-center" aria-label="Kembali">
+                                        <IconArrowLeft className="h-[60px] w-[60px] text-white" />
+                                    </Link>
+                                    <button onClick={handleFullScreen} className="items-center rounded-lg p-2 bg-white bg-opacity-20 hover:bg-opacity-40 transition" aria-label="Fullscreen">
+                                        <img src={mayoraimg} alt="Logo Mayora" className="h-[40px] md:h-[70px] lg:h-[100px]" />
+                                    </button>
                                 </div>
+                                <h1 className="text-white text-4xl md:text-5xl 2xl:text-[50px] font-black font-bigNumbers mt-4" aria-label="Counter">{(currentShift ? getShiftTarget(line, currentShift) : getTotalCarton(line))} CARTON</h1>
                             </div>
-
-                            <div className="w-full h-[500px] shadow-[1px_2px_12px_0_rgba(31,45,61,0.10)] rounded border border-white-light dark:border-[#1b2e4b] flex justify-center">
-                                <table className="w-full text-center border-collapse font-bigNumbers">
-                                    <thead>
-                                        <tr>
-                                            <th className="border border-red-500 px-4 py-2">
-                                                <h4 className="text-white text-2xl font-extrabold">JAM</h4>
-                                            </th>
-                                            <th className="border border-red-500 px-4 py-2">
-                                                <h4 className="text-white text-2xl font-extrabold">CARTON</h4>
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {hourlyData.length > 0 ? (
-                                            hourlyData.map((carton, idx) => {
-                                                const cartonValue = Number(carton) || 0;
-                                                const maxCarton = getShiftTarget(line, currentShift);
-                                                const percent = maxCarton > 0
-                                                    ? ((cartonValue / maxCarton) * 100).toFixed(1)
-                                                    : '0.0';
-                                                return (
-                                                    <tr key={idx}>
-                                                        <td className={`border border-red-500 px-2 py-2 text-black font-extrabold w-1/5 ${hourlyData.length > 4 ? 'text-5xl' : 'text-6xl'}`}>
-                                                            {idx + 1}
-                                                        </td>
-                                                        <td className={`border border-red-500 px-2 py-2 text-black font-extrabold w-3/5 ${hourlyData.length > 4 ? 'text-5xl' : 'text-6xl'}`}>
-                                                            {cartonValue.toLocaleString()} ({percent}%)
-                                                        </td>
-                                                    </tr>
-                                                );
-                                            })
-                                        ) : (
+                            <div className="text-white text-left font-bigNumbers font-bold p-6 pt-0 mt-auto w-full flex flex-col md:flex-row justify-between items-center">
+                                <h3 className="text-2xl md:text-3xl flex flex-row items-center" aria-label="Shift dan Waktu"> Shift : {currentShift !== null ? currentShift : '-'}  <IconCalendar className='ml-2' />  {currentTime.toLocaleDateString('id-ID')}  <IconClock className='ml-2' /> {currentTime.toLocaleTimeString()}</h3>
+                            </div>
+                        </header>
+                        <section className="py-7 px-6 bg-gradient-to-br from-white via-red-50 to-red-100 border-b border-red-200">
+                            <div className="flex flex-col md:flex-row items-center mb-2 gap-6">
+                                <div className="w-full  min-h-[16rem] h-auto shadow-md rounded-xl border border-red-200 flex flex-col items-center mb-2 bg-white">
+                                    <h4 className="text-red-900 text-3xl md:text-5xl mt-4 text-center font-black font-extrabold mb-2">ACTUAL</h4>
+                                    <div className="flex flex-col items-center justify-center h-full p-3">
+                                        <span className="text-red-600 text-[70px] xl:text-[170px] font-black text-center mt-[100px] font-bigNumbers">{getTotalPacked().toLocaleString()}</span>
+                                        <h4 className="text-red-900 text-3xl md:text-5xl text-center font-extrabold mt-[150px]">CARTON</h4>
+                                    </div>
+                                </div>
+                                <div className="w-full min-h-[16rem] h-auto shadow-md rounded-xl border border-red-200 flex justify-center bg-white overflow-x-auto">
+                                    <table className="w-full text-center border-collapse font-bigNumbers text-sm md:text-base lg:text-lg flex-grow">
+                                        <thead>
                                             <tr>
-                                                <td className="border border-red-500 px-2 py-2 text-black text-9xl font-extrabold w-1/5">1</td>
-                                                <td className="border border-red-500 px-2 py-2 text-black text-9xl font-extrabold w-3/5">0 (0.0%)</td>
+                                                <th className="border border-red-400 px-2 py-2 bg-red-100 whitespace-nowrap">
+                                                    <h4 className="text-red-900 text-base md:text-2xl font-extrabold">JAM</h4>
+                                                </th>
+                                                <th className="border border-red-400 px-2 py-2 bg-red-100 whitespace-nowrap">
+                                                    <h4 className="text-red-900 text-base md:text-2xl font-extrabold">CARTON</h4>
+                                                </th>
                                             </tr>
-                                        )}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                        <div className="flex flex-col md:flex-row items-center mb-2">
-                            <div className="w-full md:w-full h-[300px] shadow-[1px_2px_12px_0_rgba(31,45,61,0.10)] rounded border border-white-light dark:border-[#1b2e4b] flex flex-col justify-center mb-2 md:mb-0">
-                                <h4 className="text-black text-5xl mt-4 text-center dark:text-white font-black font-extrabold mb-2">Achievement</h4>
-                                <div className="flex flex-col items-center justify-center h-full">
-                                    <span className="text-red-600 text-[70px] xl:text-[130px] font-black text-center font-bigNumbers">{getAchievement()}%</span>
+                                        </thead>
+                                        <tbody>
+                                            {hourlyData.length > 0 ? (
+                                                hourlyData.map((carton, idx) => {
+                                                    const cartonValue = Number(carton) || 0;
+                                                    const maxCarton = getShiftTarget(line, currentShift);
+                                                    const percent = maxCarton > 0
+                                                        ? ((cartonValue / maxCarton) * 100).toFixed(1)
+                                                        : '0.0';
+                                                    return (
+                                                        <tr key={idx} className="hover:bg-red-50 transition">
+                                                            <td
+                                                                className={`border border-red-400 text-red-900 font-extrabold w-1/5 ${hourlyData.length > 4 ? 'text-5xl' : 'text-6xl'}`}
+                                                            >
+                                                                {idx + 1}
+                                                            </td>
+                                                            <td className={`border border-red-400 text-red-900 font-extrabold w-3/5 ${hourlyData.length > 4 ? 'text-5xl' : 'text-6xl'}`}>
+                                                                <div className="flex flex-row items-center justify-center">
+                                                                    <h3>{cartonValue.toLocaleString()}</h3>
+                                                                    <h3>({percent}%)</h3>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    );
+                                                })
+                                            ) : (
+                                                <tr>
+                                                    <td className="border border-red-400 text-red-900 text-2xl md:text-4xl lg:text-6xl font-extrabold w-1/5">
+                                                        1
+                                                    </td>
+                                                    <td className="border border-red-400 text-red-900 text-2xl md:text-4xl lg:text-6xl font-extrabold w-3/5">
+                                                        0
+                                                    </td>
+                                                </tr>
+                                            )}
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
-
-                            <div className="w-full md:w-full h-[300px] shadow-[1px_2px_12px_0_rgba(31,45,61,0.10)] rounded border border-white-light dark:border-[#1b2e4b] flex justify-center">
-                                <table className="w-full text-center border-collapse">
+                        </section>
+                        <section className="flex flex-col md:flex-row items-center mb-2 gap-6 bg-gradient-to-br from-white via-red-50 to-red-100 p-6">
+                            <div className="w-full min-h-[16rem] h-auto shadow-md rounded-xl border border-red-200 flex flex-col justify-center mb-2 md:mb-0 bg-white p-4 md:p-8">
+                                <div className="flex flex-col items-center justify-center h-full">
+                                    <span className="text-red-900 text-3xl md:text-5xl text-center font-black font-extrabold mb-12">
+                                        Achievement
+                                    </span>
+                                    <span className="text-red-600 text-[70px] xl:text-[130px] font-black text-center font-bigNumbers">
+                                        {getAchievement()}%
+                                    </span>
+                                    <div className="w-full bg-gray-200 rounded-full h-6 mt-[5rem]">
+                                        <div
+                                            className="bg-red-500 h-6 rounded-full"
+                                            style={{ width: `${getAchievement()}%` }}
+                                        ></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="w-full min-h-[16rem] h-auto shadow-md rounded-xl border border-red-200 flex justify-center bg-white overflow-x-auto">
+                                <table className="w-full text-center border-collapse font-bigNumbers text-sm md:text-base lg:text-lg flex-grow">
                                     <thead>
                                         <tr>
-                                            <th className="border border-red-500 px-4 py-2">
-                                                <h4 className="text-white text-4xl dark:text-white font-extrabold">SHIFT</h4>
+                                            <th className="border border-red-400 px-2 py-2 bg-red-100 whitespace-nowrap">
+                                                <h4 className="text-red-900 text-base md:text-2xl font-extrabold">SHIFT</h4>
                                             </th>
-                                            <th className="border border-red-500 px-4 py-2">
-                                                <h4 className="text-white text-4xl dark:text-white font-extrabold">CARTON</h4>
+                                            <th className="border border-red-400 px-2 py-2 bg-red-100 whitespace-nowrap">
+                                                <h4 className="text-red-900 text-base md:text-2xl font-extrabold">CARTON</h4>
                                             </th>
                                         </tr>
                                     </thead>
@@ -336,23 +376,28 @@ const ComponentCounter2a = ({ line, url, label, nameOpsi = null }: ComponentCoun
                                             const shiftNumber = shiftKey.slice(-1);
 
                                             return (
-                                                <tr key={shiftKey}>
-                                                    <td className="border border-red-500 px-2 py-1 text-black text-6xl font-extrabold">
-                                                        {shiftNumber}
-                                                    </td>
-                                                    <td className="border border-red-500 px-2 py-1 text-black text-6xl font-extrabold">
-                                                        {Number(carton).toLocaleString()} ({percent}%)
-                                                    </td>
+                                                <tr key={shiftKey} className="hover:bg-red-50 transition">
+                                                    <td className="border border-red-400 text-red-900 font-extrabold w-1/5 text-2xl md:text-4xl lg:text-5xl">{shiftNumber}</td>
+                                                    <td className="border border-red-400 text-red-900 font-extrabold w-3/5 text-2xl md:text-4xl lg:text-5xl">{Number(carton).toLocaleString()} ({percent}%)</td>
                                                 </tr>
                                             );
                                         })}
                                     </tbody>
                                 </table>
                             </div>
-                        </div>
+                        </section>
                     </div>
-                </div>
-            </div>
+                </main>
+            )}
+            <style>{`
+                    @keyframes fadeIn {
+                        from { opacity: 0; }
+                        to { opacity: 1; }
+                    }
+                    .animate-fade-in {
+                        animation: fadeIn 0.5s ease-out;
+                    }
+                `}</style>
         </div>
     );
 };
