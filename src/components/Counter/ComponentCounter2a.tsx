@@ -226,10 +226,23 @@ const ComponentCounter2a = ({ line, url, label, nameOpsi = null }: ComponentCoun
     };
 
     const getAchievement = (): number => {
-        const total = getTotalCarton(line);
-        if (total <= 0) return 0;
+        // Calculate achievement based on current shift if available, otherwise use daily target
+        // This ensures achievement matches the shift table percentages for the active shift
+        if (currentShift !== null) {
+            const shiftKey = `shift${currentShift}` as keyof ShiftData;
+            const carton = shiftData[shiftKey] || 0;
+            const maxCarton = getShiftTargetByKey(line, shiftKey);
+            if (maxCarton > 0) {
+                const achievement = Math.round((Number(carton) / maxCarton) * 100);
+                return isNaN(achievement) ? 0 : achievement;
+            }
+        }
+
+        // Fallback: calculate based on daily target
+        const dailyTarget = getTotalCarton(line);
+        if (dailyTarget <= 0) return 0;
         const packed = getTotalPacked();
-        const achievement = Math.round((packed / total) * 100);
+        const achievement = Math.round((packed / dailyTarget) * 100);
         return isNaN(achievement) ? 0 : achievement;
     };
 

@@ -185,8 +185,13 @@ const ComponentCounterMalcok2b: React.FC<ComponentCounterProps> = ({ line, url, 
     const getTotalPacked = (): number => packingData.cntr_carton;
 
     const getAchievement = (): number => {
+        // Calculate achievement based on total packed vs total target
+        // For Malcok2b, each shift uses the same daily target
         const total = getTotalCarton(line);
-        return Math.round((getTotalPacked() / total) * 100);
+        if (total <= 0) return 0;
+        const packed = getTotalPacked();
+        const achievement = Math.round((packed / total) * 100);
+        return isNaN(achievement) ? 0 : achievement;
     };
 
     const ErrorDisplay = ({ message, onRetry }: { message: string, onRetry: () => void }) => (
