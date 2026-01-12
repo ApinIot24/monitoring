@@ -24,8 +24,8 @@ interface ShiftData {
 }
 
 const TOTAL_CARTON = {
-    renceng_l2b: 6000,
-    tray_l2b: 1016,
+    renceng_l2b: 10000,
+    tray_l2b: 2347,
 };
 const TOTAL_CARTON_Sabtu = {
     renceng_l2b: 4375,
