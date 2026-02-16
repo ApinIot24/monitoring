@@ -27,14 +27,14 @@ const TOTAL_CARTON = {
     l1: 1016,
     l2: 1016,
     l5: 6640,
-    l6: 2432,
+    l6: 3800,
     l7: 2432,
 };
 const TOTAL_CARTON_Sabtu = {
     l1: 630,
     l2: 630,
     l5: 4150,
-    l6: 1330,
+    l6: 2375,
     l7: 1330,
 };
 
@@ -188,7 +188,7 @@ const ComponentCounter: React.FC<ComponentCounterProps> = ({ line, url, label, n
         const carton = packingData?.cntr_carton || 0;
         return Number(carton) || 0;
     };
-    
+
     const getAchievement = (): number => {
         const total = getTotalCarton(line);
         if (total <= 0) return 0;
@@ -240,11 +240,11 @@ const ComponentCounter: React.FC<ComponentCounterProps> = ({ line, url, label, n
                                 <h1 className="text-white text-4xl md:text-5xl 2xl:text-[50px] font-black font-bigNumbers mt-4" aria-label="Counter">{getTotalCarton(line)} COUNTER</h1>
                             </div>
                             <div className="text-white text-left font-bigNumbers font-bold p-6 pt-0 mt-auto w-full flex flex-col md:flex-row justify-between items-center">
-                                <h3 className="text-2xl md:text-3xl flex flex-row items-center" aria-label="Shift dan Waktu"> 
-                                    Shift : {currentShift !== null ? currentShift : '-'}  
-                                    <IconCalendar className='ml-2' />  
-                                    {currentTime.toLocaleDateString('id-ID')}  
-                                    <IconClock className='ml-2' /> 
+                                <h3 className="text-2xl md:text-3xl flex flex-row items-center" aria-label="Shift dan Waktu">
+                                    Shift : {currentShift !== null ? currentShift : '-'}
+                                    <IconCalendar className='ml-2' />
+                                    {currentTime.toLocaleDateString('id-ID')}
+                                    <IconClock className='ml-2' />
                                     {currentTime.toLocaleTimeString()}
                                 </h3>
                             </div>
@@ -277,8 +277,8 @@ const ComponentCounter: React.FC<ComponentCounterProps> = ({ line, url, label, n
                                                 hourlyData.map((carton, idx) => {
                                                     const cartonValue = Number(carton) || 0;
                                                     const maxCarton = getTotalCarton(line);
-                                                    const percent = maxCarton > 0 
-                                                        ? ((cartonValue / maxCarton) * 100).toFixed(1) 
+                                                    const percent = maxCarton > 0
+                                                        ? ((cartonValue / maxCarton) * 100).toFixed(1)
                                                         : '0.0';
                                                     return (
                                                         <tr key={idx} className="hover:bg-red-50 transition">
@@ -344,11 +344,11 @@ const ComponentCounter: React.FC<ComponentCounterProps> = ({ line, url, label, n
                                         {(['shift1', 'shift2', 'shift3'] as Array<keyof ShiftData>).map((shiftKey) => {
                                             const carton = shiftData[shiftKey] || 0;
                                             const maxCarton = getTotalCarton(line);
-                                            const percent = maxCarton > 0 
-                                                ? ((Number(carton) / maxCarton) * 100).toFixed(1) 
+                                            const percent = maxCarton > 0
+                                                ? ((Number(carton) / maxCarton) * 100).toFixed(1)
                                                 : '0.0';
                                             const shiftNumber = shiftKey.slice(-1);
-                                            
+
                                             return (
                                                 <tr key={shiftKey} className="hover:bg-red-50 transition">
                                                     <td className="border border-red-400 text-red-900 font-extrabold w-1/5 text-2xl md:text-4xl lg:text-5xl">
