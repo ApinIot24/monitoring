@@ -27,14 +27,14 @@ const TOTAL_CARTON = {
     l1: 1016,
     l2: 1016,
     l5: 6640,
-    l6: 2432,
+    l6: 3800,
     l7: 2432,
 };
 const TOTAL_CARTON_Sabtu = {
     l1: 630,
     l2: 630,
     l5: 4150,
-    l6: 1330,
+    l6: 2375,
     l7: 1330,
 };
 
@@ -64,12 +64,12 @@ const ComponentCounter: React.FC<ComponentCounterProps> = ({ line, url, label, n
     };
 
     const APIURLs = {
-        packing: `http://10.37.12.34:3000/packing_${line}`,
-        shift: `http://10.37.12.34:3000/shift_${line}`,
+        packing: `http://10.37.12.11:3000/packing_${line}`,
+        shift: `http://10.37.12.11:3000/shift_${line}`,
         hourly: {
-            shift1: `http://10.37.12.34:3000/shift1_${line}_hourly`,
-            shift2: `http://10.37.12.34:3000/shift2_${line}_hourly`,
-            shift3: `http://10.37.12.34:3000/shift3_${line}_hourly`,
+            shift1: `http://10.37.12.11:3000/shift1_${line}_hourly`,
+            shift2: `http://10.37.12.11:3000/shift2_${line}_hourly`,
+            shift3: `http://10.37.12.11:3000/shift3_${line}_hourly`,
         },
     };
 

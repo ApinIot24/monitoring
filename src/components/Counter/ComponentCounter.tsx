@@ -63,12 +63,12 @@ const ComponentCounter: React.FC<ComponentCounterProps> = ({ line, url, label, n
     };
 
     const APIURLs = {
-        packing: `http://10.37.12.34:3000/packing_${line}`,
-        shift: `http://10.37.12.34:3000/shift_${line}`,
+        packing: `http://10.37.12.11:3000/packing_${line}`,
+        shift: `http://10.37.12.11:3000/shift_${line}`,
         hourly: {
-            shift1: `http://10.37.12.34:3000/shift1_${line}_hourly`,
-            shift2: `http://10.37.12.34:3000/shift2_${line}_hourly`,
-            shift3: `http://10.37.12.34:3000/shift3_${line}_hourly`
+            shift1: `http://10.37.12.11:3000/shift1_${line}_hourly`,
+            shift2: `http://10.37.12.11:3000/shift2_${line}_hourly`,
+            shift3: `http://10.37.12.11:3000/shift3_${line}_hourly`
         }
     };
 
