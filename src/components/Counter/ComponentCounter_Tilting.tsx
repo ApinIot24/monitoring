@@ -23,6 +23,7 @@ interface ShiftData {
     shift3: string;
 }
 
+
 const TOTAL_CARTON = {
     l1: 1016,
     l2: 1368,
@@ -48,6 +49,7 @@ const ComponentCounter: React.FC<ComponentCounterProps> = ({ line, url, label, n
     const [isLoading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [retryCount, setRetryCount] = useState<number>(0);
+    const [variancePercentage, setVariancePercentage] = useState<string | null>(null);
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -66,6 +68,7 @@ const ComponentCounter: React.FC<ComponentCounterProps> = ({ line, url, label, n
 
     const APIURLs = {
         packing: `http://10.37.12.11:3000/tilting_${line}`,
+        variance_percentage: `http://10.37.12.11:3000/tilting_${line}_variance`,
         shift: `http://10.37.12.11:3000/tilting_${line}_variance_per_shift`,
         hourly: {
             shift1: `http://10.37.12.11:3000/shift1_${line}_tilting_hourly`,
@@ -81,6 +84,15 @@ const ComponentCounter: React.FC<ComponentCounterProps> = ({ line, url, label, n
         } catch (err) {
             console.error(err);
             setError('Gagal memuat data packing');
+        }
+    };
+
+    const fetchVariancePercentage = async () => {
+        try {
+            const response = await axios.get(APIURLs.variance_percentage);
+            setVariancePercentage(response.data.variance_percentage || null);
+        } catch (err) {
+            console.error(err);
         }
     };
 
@@ -170,7 +182,8 @@ const ComponentCounter: React.FC<ComponentCounterProps> = ({ line, url, label, n
         Promise.all([
             fetchPackingData(),
             fetchShiftData(),
-            fetchHourlyData()
+            fetchHourlyData(),
+            fetchVariancePercentage()
         ]).then(() => setLoading(false))
             .catch(() => {
                 setError("Gagal memuat data");
@@ -181,6 +194,7 @@ const ComponentCounter: React.FC<ComponentCounterProps> = ({ line, url, label, n
             fetchPackingData();
             fetchShiftData();
             fetchHourlyData();
+            fetchVariancePercentage();
         }, 3000);
         return () => clearInterval(interval);
     }, [line, retryCount]);
@@ -240,14 +254,14 @@ const ComponentCounter: React.FC<ComponentCounterProps> = ({ line, url, label, n
                         <section className="py-7 px-6 bg-gradient-to-br from-white via-red-50 to-red-100 border-b border-red-200">
                             <div className="flex flex-col md:flex-row items-center mb-2 gap-6">
                                 <div className="w-full  min-h-[16rem] h-auto shadow-md rounded-xl border border-red-200 flex flex-col items-center mb-2 bg-white">
-                                    <h4 className="text-red-900 text-3xl md:text-5xl mt-4 text-center font-black font-extrabold mb-2">ACTUAL</h4>
+                                    <h4 className="text-red-900 text-3xl md:text-5xl mt-4 text-center font-black mb-2">ACTUAL</h4>
                                     <div className="flex flex-col items-center justify-center h-full p-3">
                                         <span className="text-red-600 text-[70px] xl:text-[170px] font-black text-center mt-[100px] font-bigNumbers">{getTotalPacked()}</span>
                                         <h4 className="text-red-900 text-3xl md:text-5xl text-center font-extrabold mt-[150px]">Tilting</h4>
                                     </div>
                                 </div>
                                 <div className="w-full  min-h-[16rem] h-auto shadow-md rounded-xl border border-red-200 flex flex-col items-center mb-2 bg-white">
-                                    <h4 className="text-red-900 text-3xl md:text-5xl mt-4 text-center font-black font-extrabold mb-2">
+                                    <h4 className="text-red-900 text-3xl md:text-5xl mt-4 text-center font-black mb-2">
                                         Achievement
                                     </h4>
                                     <div className="flex flex-col items-center justify-center h-full p-3">
@@ -255,7 +269,7 @@ const ComponentCounter: React.FC<ComponentCounterProps> = ({ line, url, label, n
                                         <div className="w-full bg-gray-200 rounded-full h-6  mt-[150px]">
                                             <div
                                                 className="bg-red-500 h-6 rounded-full"
-                                                style={{ width: `${getAchievement()}%` }}
+                                                style={{ width: `${Math.min(getAchievement(), 100)}%` }}
                                             ></div>
                                         </div>
                                     </div>
@@ -277,10 +291,13 @@ const ComponentCounter: React.FC<ComponentCounterProps> = ({ line, url, label, n
                                     </thead>
                                     <tbody className='font-bigNumbers'>
                                         {Object.entries(shiftData).map(([shift, variance]) => {
+                                            const shiftNumber = parseInt(shift.slice(-1));
+                                            const isCurrentShift = shiftNumber === currentShift;
+                                            const displayVariance = isCurrentShift ? (variancePercentage ?? variance) : variance;
                                             return (
                                                 <tr key={shift} className="hover:bg-red-50 transition">
                                                     <td className="border border-red-400 text-red-900 font-extrabold w-1/5 text-2xl md:text-4xl lg:text-6xl">{shift.slice(-1)}</td>
-                                                    <td className="border border-red-400 text-red-900 font-extrabold w-3/5 text-2xl md:text-4xl lg:text-[60px]" style={{ whiteSpace: 'nowrap' }}>{variance}%</td>
+                                                    <td className="border border-red-400 text-red-900 font-extrabold w-3/5 text-2xl md:text-4xl lg:text-[60px]" style={{ whiteSpace: 'nowrap' }}>{displayVariance}%</td>
                                                 </tr>
                                             );
                                         })}
