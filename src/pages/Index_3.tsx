@@ -36,16 +36,16 @@ const Index = () => {
     };
 
     const [urlapi] = useState({
-        packingl1_shift1: 'http://10.37.12.34:3000/shift1_l1_hourly',
-        packingl1_shift2: 'http://10.37.12.34:3000/shift2_l1_hourly',
-        packingl1_shift3: 'http://10.37.12.34:3000/shift3_l1_hourly',
+        packingl1_shift1: 'http://10.37.12.11:3000/shift1_l1_hourly',
+        packingl1_shift2: 'http://10.37.12.11:3000/shift2_l1_hourly',
+        packingl1_shift3: 'http://10.37.12.11:3000/shift3_l1_hourly',
 
-        packingl2_shift1: 'http://10.37.12.34:3000/shift1_l2_hourly',
-        packingl2_shift2: 'http://10.37.12.34:3000/shift2_l2_hourly',
-        packingl2_shift3: 'http://10.37.12.34:3000/shift3_l2_hourly',
+        packingl2_shift1: 'http://10.37.12.11:3000/shift1_l2_hourly',
+        packingl2_shift2: 'http://10.37.12.11:3000/shift2_l2_hourly',
+        packingl2_shift3: 'http://10.37.12.11:3000/shift3_l2_hourly',
 
-        packingl1_shift: 'http://10.37.12.34:3000/shift_l1',
-        packingl2_shift: 'http://10.37.12.34:3000/shift_l2',
+        packingl1_shift: 'http://10.37.12.11:3000/shift_l1',
+        packingl2_shift: 'http://10.37.12.11:3000/shift_l2',
     });
 
     const total_planing_l1 = 1008;
@@ -59,7 +59,7 @@ const Index = () => {
 
     useEffect(() => {
         const fetchData = () => {
-            axios.get('http://10.37.12.34:3000/packing_l1')
+            axios.get('http://10.37.12.11:3000/packing_l1')
                 .then((response) => {
                     setData(response.data.length > 0 ? response.data : [{ cntr_carton: 0 }]);
                 })
@@ -69,7 +69,7 @@ const Index = () => {
                 });
         };
         const fetchData1 = () => {
-            axios.get('http://10.37.12.34:3000/packing_l2')
+            axios.get('http://10.37.12.11:3000/packing_l2')
                 .then((response) => {
                     setData1(response.data.length > 0 ? response.data : [{ cntr_carton: 0 }]);
                 })

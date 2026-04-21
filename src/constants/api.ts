@@ -3,7 +3,7 @@
  * Centralized API base URL and endpoints
  */
 
-export const API_BASE_URL = 'http://10.37.12.34:3000';
+export const API_BASE_URL = 'http://10.37.12.11:3000';
 
 export const API_ENDPOINTS = {
     packing: (line: string) => `${API_BASE_URL}/packing_${line}`,
